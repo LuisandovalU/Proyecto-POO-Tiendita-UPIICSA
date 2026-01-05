@@ -14,13 +14,6 @@ Para asegurar el correcto funcionamiento del software, el entorno de ejecución 
 * **Memoria RAM:** Mínimo 2GB disponibles.
 * **Resolución de Pantalla:** 1024x768 o superior (Optimizado para visualización de tablas Swing).
 
-## 🗺️ Diagrama de Clases UML
-<img src="screenshots/diagrama.jpg" width="800">
-
-## 📸 Evidencia de Funcionamiento
-### Interfaz de Ventas y Tiempo Aire
-<img src="screenshots/ventas.png" width="400"> <img src="screenshots/recargas.png" width="400">
-
 ## 3. Guía de Instalación
 
 ### 3.1. Obtención del Software
@@ -52,3 +45,10 @@ El sistema se rige por la arquitectura definida en el diagrama de clases adjunto
 * **Tiempo Aire:** Interfaz independiente para recargas telefónicas con validaciones de 10 dígitos.
 * **Inventario y Proveedores:** Registro de stock, mermas (Frescos) y órdenes de resurtido.
 * **Promociones:** Motor de descuentos dinámicos para productos próximos a caducar.
+
+##  Diagrama de Clases 
+<img src="screenshots/diagrama.jpg" width="800">
+
+##  Evidencia de Funcionamiento
+### Interfaz de Ventas y Tiempo Aire
+<img src="screenshots/ventas.png" width="400"> <img src="screenshots/recargas.png" width="400">
