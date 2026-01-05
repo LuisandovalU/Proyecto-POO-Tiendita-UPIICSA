@@ -1,92 +1,47 @@
-# Sistema de Punto de Venta - Tienda de la Esquina
+# Sistema de Gestión para Punto de Venta: "La Tiendita"
 
-Sistema completo de Punto de Venta desarrollado en Java con Swing y FlatLaf, siguiendo el patrón de diseño MVC (Modelo-Vista-Controlador) y cumpliendo con los requerimientos del diagrama de clases UML y especificaciones de negocio.
+## 1. Información Institucional
+* **Institución:** Instituto Politécnico Nacional (IPN)
+* **Unidad Académica:** Unidad Profesional Interdisciplinaria de Ingeniería y Ciencias Sociales y Administrativas (UPIICSA)
+* **Unidad de Aprendizaje:** Programación Orientada a Objetos
+* **Alumno:** Sandoval Ramos Luis Alberto
+* **Correo Institucional:** lsandovalr1901@alumno.ipn.mx
+* **Semestre:** Tercero
 
-## Características Principales
+## 2. Requisitos del Sistema
+Para asegurar el correcto funcionamiento del software, el entorno de ejecución debe cumplir con:
+* **Java Development Kit (JDK):** Versión 17 o superior.
+* **Memoria RAM:** Mínimo 2GB disponibles.
+* **Resolución de Pantalla:** 1024x768 o superior (Optimizado para visualización de tablas Swing).
 
-### Arquitectura y Diseño
-- ✅ **Patrón MVC**: Separación clara en paquetes `model`, `view` y `controller`
-- ✅ **Herencia y Polimorfismo**: Jerarquía completa de productos con clases abstractas
-- ✅ **Interfaz Moderna**: Dark Mode con FlatLaf
-- ✅ **Validaciones Robustas**: Try-catch en todos los puntos de entrada
-- ✅ **Preparado para Persistencia**: Interfaces DAO para mapeo objeto-relacional
+## 3. Guía de Instalación
 
-### Funcionalidades de Negocio
+### 3.1. Obtención del Software
+Existen dos métodos para obtener los archivos del proyecto:
 
-#### 1. Gestión de Productos
-- Jerarquía completa: Frescos, Abarrotes, Dulcería, Limpieza, Otros, TiempoAire
-- Validación de stock con verificación de stock mínimo
-- Código de barras para cada producto
+**A. Vía Repositorio Remoto (Recomendado):**
+Ejecutar el siguiente comando en la terminal:
+git clone https://github.com/LuisandovalU/Proyecto-POO-Tiendita-UPIICSA.git
 
-#### 2. Sistema de Promociones
-- Promociones con fechas de inicio y fin
-- Aplicación automática de descuentos según fechas
-- Gestión de productos perecederos próximos a caducar
+**B. Vía Almacenamiento Externo (USB/Local):**
+1. Copiar la carpeta raíz del proyecto al disco local.
+2. Asegurarse de que la estructura de carpetas incluya los directorios `src` (código fuente) y `lib` (librerías externas).
 
-#### 3. Sistema de Usuarios y Permisos
-- **Administrador**: Acceso completo, reportes, pedidos
-- **Vendedor**: Ventas, cobros, devoluciones
-- **Encargado**: Ventas + verificar entregas
+### 3.2. Configuración de Dependencias (Librería FlatLaf)
+El proyecto utiliza la librería **FlatLaf** para el diseño visual. Para que el proyecto compile sin errores:
+1. Localizar el archivo `.jar` de FlatLaf dentro de la carpeta `lib` del proyecto.
+2. En su IDE (IntelliJ, Eclipse, NetBeans), acceder a la configuración de la estructura del proyecto (Project Structure / Libraries).
+3. Agregar el archivo `.jar` mencionado como una dependencia de biblioteca externa.
 
-## Estructura del Proyecto
+## 4. Instrucciones de Ejecución
+1. Abrir su Entorno de Desarrollo (IDE).
+2. Cargar el proyecto seleccionando la carpeta raíz.
+3. Localizar la clase principal `Main.java` dentro del paquete `com.tienda`.
+4. Ejecutar el comando `Run`.
 
-```
-Tienda/
-├── src/main/java/com/tienda/
-│   ├── model/          # Clases del modelo
-│   ├── view/           # Clases de la interfaz gráfica
-│   ├── controller/     # Controladores (MVC)
-│   ├── dao/            # Interfaces DAO para persistencia
-│   └── main/           # Clase principal
-├── pom.xml
-└── README.md
-```
-
-## Requisitos
-
-- Java 11 o superior
-- Maven 3.6 o superior
-
-## Instalación y Ejecución
-
-### Usando Maven
-
-1. Compilar: `mvn clean compile`
-2. Ejecutar: `mvn exec:java`
-
-## Uso del Sistema
-
-El sistema inicia directamente con **perfil de Vendedor** por defecto, sin necesidad de login.
-
-1. **Realizar Ventas**: 
-   - Seleccione categoría en la barra lateral
-   - Agregue productos haciendo clic en "Agregar"
-   - Vea el carrito en el panel derecho
-   - Seleccione forma de pago y finalice la venta
-
-2. **Funciones Disponibles**:
-   - Ventas de productos
-   - Cobros y cambio
-   - Procesar devoluciones
-   - Ver promociones aplicadas automáticamente
-
-## Cumplimiento del Temario UPIICSA
-
-### Unidad III: Herencia y Polimorfismo
-- ✅ Herencia en jerarquía de productos y usuarios
-- ✅ Polimorfismo con métodos abstractos
-
-### Unidad IV: Interfaces Gráficas y Excepciones
-- ✅ Swing + FlatLaf con Dark Mode
-- ✅ Patrón MVC
-- ✅ Manejo de Excepciones con try-catch
-
-### Unidad V: Persistencia
-- ✅ Interfaces DAO para mapeo objeto-relacional
-
-## Tecnologías
-
-- Java 11
-- Swing
-- FlatLaf 3.2.5
-- Maven
+## 5. Descripción de Módulos (Diagrama de Clases)
+El sistema se rige por la arquitectura definida en el diagrama de clases adjunto:
+* **Ventas:** Procesamiento de productos y servicios con cálculo de impuestos.
+* **Tiempo Aire:** Interfaz independiente para recargas telefónicas con validaciones de 10 dígitos.
+* **Inventario y Proveedores:** Registro de stock, mermas (Frescos) y órdenes de resurtido.
+* **Promociones:** Motor de descuentos dinámicos para productos próximos a caducar.
