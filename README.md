@@ -14,6 +14,13 @@ Para asegurar el correcto funcionamiento del software, el entorno de ejecución 
 * **Memoria RAM:** Mínimo 2GB disponibles.
 * **Resolución de Pantalla:** 1024x768 o superior (Optimizado para visualización de tablas Swing).
 
+## 🗺️ Diagrama de Clases UML
+<img src="screenshots/diagrama.jpg" width="800">
+
+## 📸 Evidencia de Funcionamiento
+### Interfaz de Ventas y Tiempo Aire
+<img src="screenshots/ventas.png" width="400"> <img src="screenshots/recargas.png" width="400">
+
 ## 3. Guía de Instalación
 
 ### 3.1. Obtención del Software
