@@ -1,17 +1,23 @@
 package com.tienda.model;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * CLASE: Venta (Unidad II - Clases y Objetos)
  * Representa el ticket o transacción final de la tienda.
+ * 
+ * COMENTARIO DE INGENIERÍA: Se migró de LocalDate a LocalDateTime para capturar
+ * la precisión de horas y minutos en cada transacción, permitiendo una
+ * auditoría en tiempo real exacta y evitando conflictos de tipo en el formateo.
  */
-public class Venta {
+public class Venta implements Cloneable {
     // RELACIÓN DE COMPOSICIÓN/AGREGACIÓN (Unidad III):
     // Una Venta 'tiene una' lista de Productos. Sin productos, no hay venta.
-    private LocalDate fecha; // Fecha de la operación
+    private static int contadorFolios = 1; // Contador estático para folios correlativos
+    private int folio; // Identificador único de la venta
+    private LocalDateTime fecha; // Fecha de la operación
     private String formaPago; // Efectivo, Tarjeta, etc. (Unidad I)
     private double total; // Monto final a pagar
     private double descuentoAplicado; // Valor ahorrado por el cliente
@@ -19,7 +25,8 @@ public class Venta {
     private Promocion promocionAplicada; // Asociación con una promoción opcional
 
     public Venta() {
-        this.fecha = LocalDate.now();
+        this.folio = contadorFolios++;
+        this.fecha = LocalDateTime.now();
         this.listaProductos = new ArrayList<>();
         this.total = 0.0;
         this.descuentoAplicado = 0.0;
@@ -44,8 +51,8 @@ public class Venta {
                     if (f.verificarCaducidad() && promocionAplicada == null) {
                         System.out.println("Sugerencia del Sistema: Aplicando 'Remate de Frescos' (20% OFF)");
                         // Creamos una promoción virtual de remate inmediata (Unidad II)
-                        Promocion remate = new Promocion("Remate de Frescos", 20.0, LocalDate.now(),
-                                LocalDate.now().plusDays(1));
+                        Promocion remate = new Promocion("Remate de Frescos", 20.0, java.time.LocalDate.now(),
+                                java.time.LocalDate.now().plusDays(1));
                         remate.getListaProductos().add(f);
                         this.promocionAplicada = remate;
                     }
@@ -144,12 +151,35 @@ public class Venta {
         }
     }
 
+    /**
+     * Implementación de Clonación Profunda (Unidad II/III)
+     * Permite guardar el estado de la venta en el historial sin que cambios
+     * posteriores afecten el registro.
+     */
+    @Override
+    public Venta clone() {
+        try {
+            Venta clon = (Venta) super.clone();
+            // Clonamos la lista de productos para asegurar independencia (Clonación
+            // Profunda)
+            clon.listaProductos = new ArrayList<>(this.listaProductos);
+            return clon;
+        } catch (CloneNotSupportedException e) {
+            System.err.println("Error al clonar venta: " + e.getMessage());
+            return null;
+        }
+    }
+
     // Getters y Setters
-    public LocalDate getFecha() {
+    public int getFolio() {
+        return folio;
+    }
+
+    public LocalDateTime getFecha() {
         return fecha;
     }
 
-    public void setFecha(LocalDate fecha) {
+    public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
 

@@ -1,7 +1,7 @@
 package com.tienda.view;
 
 import com.tienda.controller.ProductoController;
-import com.tienda.controller.VentaController;
+import com.tienda.controller.ControladorVentas;
 import com.tienda.model.Frescos;
 import com.tienda.model.Producto;
 import com.tienda.model.TiempoAire;
@@ -19,7 +19,7 @@ import java.text.DecimalFormat;
  */
 public class VistaVentas extends JPanel {
     private ProductoController productoController;
-    private VentaController ventaController;
+    private ControladorVentas ventaController;
 
     private JTable tablaProductos;
     private DefaultTableModel modeloProductos;
@@ -34,7 +34,7 @@ public class VistaVentas extends JPanel {
     private String categoriaActual = "Todos";
     private DecimalFormat df = new DecimalFormat("#,##0.00");
 
-    public VistaVentas(ProductoController productoController, VentaController ventaController) {
+    public VistaVentas(ProductoController productoController, ControladorVentas ventaController) {
         this.productoController = productoController;
         this.ventaController = ventaController;
 
@@ -435,16 +435,39 @@ public class VistaVentas extends JPanel {
 
             String formaPago = (String) comboFormaPago.getSelectedItem();
             if (ventaController.finalizarVenta(formaPago)) {
-                // finalizarVenta() ya resta el stockActual automáticamente
-                JOptionPane.showMessageDialog(this,
-                        "Venta finalizada exitosamente\nTotal: $" + df.format(venta.getTotal()),
-                        "Venta Exitosa", JOptionPane.INFORMATION_MESSAGE);
+                System.out.println("DEBUG: Venta finalizada correctamente en controlador.");
+                JOptionPane.showMessageDialog(this, "Venta Exitosa");
                 actualizarCarrito();
                 actualizarTablaProductos();
             } else {
+                System.err.println("DEBUG: El controlador falló al finalizar la venta.");
                 JOptionPane.showMessageDialog(this,
                         "Error al finalizar la venta",
                         "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            // FORZAR REFRESCO: Buscamos la pestaña de historial independientemente del
+            // éxito del controlador
+            // para diagnóstico visual.
+            try {
+                JTabbedPane tabbedPane = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class, this);
+                if (tabbedPane != null) {
+                    boolean vistaEncontrada = false;
+                    for (Component c : tabbedPane.getComponents()) {
+                        if (c instanceof VistaHistorial) {
+                            ((VistaHistorial) c).actualizarTabla();
+                            vistaEncontrada = true;
+                            System.out.println("DEBUG: VistaHistorial notificada para actualizar.");
+                        }
+                    }
+                    if (!vistaEncontrada) {
+                        System.err.println("DEBUG: No se encontró la instancia de VistaHistorial en el JTabbedPane.");
+                    }
+                } else {
+                    System.err.println("DEBUG: No se pudo obtener el JTabbedPane ancestro.");
+                }
+            } catch (Exception ex) {
+                System.err.println("DEBUG: Error al intentar sincronizar vistas: " + ex.getMessage());
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,

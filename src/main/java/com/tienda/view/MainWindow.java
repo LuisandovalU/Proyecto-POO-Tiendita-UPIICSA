@@ -4,7 +4,7 @@ import com.tienda.controller.PedidoProveedorController;
 import com.tienda.controller.ProductoController;
 import com.tienda.controller.ProveedorController;
 import com.tienda.controller.UsuarioController;
-import com.tienda.controller.VentaController;
+import com.tienda.controller.ControladorVentas;
 import com.tienda.model.Vendedor;
 
 import javax.swing.*;
@@ -20,7 +20,7 @@ public class MainWindow extends JFrame {
     // CONTROLADORES (MVC):
     // La vista interactúa con los controladores para manejar la lógica de negocio.
     private ProductoController productoController;
-    private VentaController ventaController;
+    private ControladorVentas ventaController;
     private ProveedorController proveedorController;
     private PedidoProveedorController pedidoProveedorController;
     private UsuarioController usuarioController;
@@ -56,7 +56,7 @@ public class MainWindow extends JFrame {
 
         // Inicializar controladores
         this.productoController = new ProductoController();
-        this.ventaController = new VentaController();
+        this.ventaController = new ControladorVentas();
         this.proveedorController = new ProveedorController();
         this.pedidoProveedorController = new PedidoProveedorController(productoController);
 
@@ -79,7 +79,7 @@ public class MainWindow extends JFrame {
 
         // Inicializar controladores
         this.productoController = new ProductoController();
-        this.ventaController = new VentaController();
+        this.ventaController = new ControladorVentas();
         this.proveedorController = new ProveedorController();
         this.pedidoProveedorController = new PedidoProveedorController(productoController);
 
@@ -147,5 +147,9 @@ public class MainWindow extends JFrame {
         setSize(1400, 800);
         setLocationRelativeTo(null);
         setResizable(true);
+    }
+
+    public VistaHistorial getVistaHistorial() {
+        return vistaHistorial;
     }
 }

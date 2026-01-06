@@ -1,14 +1,10 @@
 package com.tienda.view;
 
-import com.tienda.controller.VentaController;
-import com.tienda.model.Venta;
+import com.tienda.controller.ControladorVentas;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.text.DecimalFormat;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 /**
  * Vista del módulo de Historial de Ventas
@@ -16,13 +12,11 @@ import java.util.List;
  * Unidad V: Persistencia (Memoria RAM en este caso para fines académicos)
  */
 public class VistaHistorial extends JPanel {
-    private VentaController ventaController;
+    private ControladorVentas ventaController;
     private JTable tablaHistorial;
     private DefaultTableModel modeloHistorial;
-    private DecimalFormat df = new DecimalFormat("#,##0.00");
-    private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public VistaHistorial(VentaController ventaController) {
+    public VistaHistorial(ControladorVentas ventaController) {
         this.ventaController = ventaController;
 
         setLayout(new BorderLayout(10, 10));
@@ -54,7 +48,8 @@ public class VistaHistorial extends JPanel {
         add(panelSuperior, BorderLayout.NORTH);
 
         // Tabla de historial
-        String[] columnas = { "Fecha/Hora", "Forma de Pago", "Cant. Productos", "Promoción", "Total Neto" };
+        // REQUERIMIENTO: Folio, Fecha, Total y si hubo Promociones aplicadas
+        String[] columnas = { "Folio", "Fecha/Hora", "Total Neto", "Promociones" };
         modeloHistorial = new DefaultTableModel(columnas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -78,24 +73,16 @@ public class VistaHistorial extends JPanel {
         add(scrollPane, BorderLayout.CENTER);
     }
 
+    /**
+     * Refresca la tabla recuperando la lista completa desde el controlador.
+     * PROPÓSITO ACADÉMICO: Esta sincronización cumple con el requerimiento de
+     * 'auditoría en tiempo real' para el perfil de Administrador definido
+     * en el ejercicio de 'La Tienda de la Esquina'.
+     */
     public void actualizarTabla() {
         try {
-            modeloHistorial.setRowCount(0);
-            List<Venta> ventas = ventaController.obtenerTodasVentas();
-
-            for (Venta venta : ventas) {
-                String promoNombre = (venta.getPromocionAplicada() != null)
-                        ? venta.getPromocionAplicada().getNombrePromo()
-                        : "Ninguna";
-
-                Object[] fila = {
-                        venta.getFecha().format(dtf),
-                        venta.getFormaPago(),
-                        venta.getListaProductos().size(),
-                        promoNombre,
-                        "$" + df.format(venta.getTotal())
-                };
-                modeloHistorial.addRow(fila);
+            if (ventaController != null) {
+                ventaController.actualizarTablaHistorial(modeloHistorial);
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,
