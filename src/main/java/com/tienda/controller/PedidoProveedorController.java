@@ -101,7 +101,7 @@ public class PedidoProveedorController {
                 System.out.println("Procesando entrega: " + productosPedido.size() + " productos.");
 
                 for (Producto productoPedido : productosPedido) {
-                    Producto productoInventario = productoController.buscarPorCodigoBarras(
+                    Producto productoInventario = productoController.buscarProducto(
                             productoPedido.getCodigoBarras());
 
                     if (productoInventario != null) {

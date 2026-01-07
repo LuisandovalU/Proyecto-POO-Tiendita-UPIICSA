@@ -87,8 +87,8 @@ public class TestRestructuring {
 
         ppc.marcarComoEntregado(pedido);
 
-        int finalStock = pc.buscarPorCodigoBarras("999").getStockActual();
-        System.out.println("Stock after Delivery (5 + 10): " + finalStock);
+        p = pc.buscarProducto("999");
+        int finalStock = p.getStockActual();
 
         if (finalStock == 15 && pedido.getProveedor().equals(prov)) {
             System.out.println("[OK] UML Relationships and Stock flow are perfect.");

@@ -10,6 +10,7 @@ import java.util.List;
 public interface ProductoDAO {
     /**
      * Guarda un producto en la base de datos
+     * 
      * @param producto Producto a guardar
      * @return true si se guardó correctamente
      */
@@ -17,19 +18,22 @@ public interface ProductoDAO {
 
     /**
      * Busca un producto por código de barras
+     * 
      * @param codigoBarras Código de barras del producto
      * @return Producto encontrado o null
      */
-    Producto buscarPorCodigoBarras(String codigoBarras);
+    Producto buscarProducto(String codigoBarras);
 
     /**
      * Obtiene todos los productos
+     * 
      * @return Lista de todos los productos
      */
     List<Producto> obtenerTodos();
 
     /**
      * Actualiza un producto existente
+     * 
      * @param producto Producto a actualizar
      * @return true si se actualizó correctamente
      */
@@ -37,6 +41,7 @@ public interface ProductoDAO {
 
     /**
      * Elimina un producto
+     * 
      * @param codigoBarras Código de barras del producto a eliminar
      * @return true si se eliminó correctamente
      */

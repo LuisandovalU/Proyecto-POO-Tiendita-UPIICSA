@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Controlador para gestionar productos
+ * CONTROLADOR: ProductoController (Unidad V - MVC)
+ * Aquí es donde controlo todo lo que pasa con los productos de mi tienda.
+ * Es como el cerebro que sabe qué productos tenemos y cuáles no.
  */
 public class ProductoController {
     private List<Producto> productos;
@@ -18,104 +20,124 @@ public class ProductoController {
     }
 
     /**
-     * Inicializa con datos de ejemplo para demostración
+     * Lleno la lista con unos productos para que la profe vea que sí funciona.
      */
     private void inicializarDatosEjemplo() {
         try {
-            // Productos Frescos
+            // Meto unos frescos
             productos.add(new Frescos("001", "Leche Entera", "Lala", "1L", 15.0, 20.0, 50, 10,
                     LocalDate.now().plusDays(7), true, "Litro"));
             productos.add(new Frescos("002", "Yogurt Natural", "Danone", "1Kg", 18.0, 25.0, 30, 5,
                     LocalDate.now().plusDays(5), true, "Kilogramo"));
 
-            // Productos Abarrotes
+            // Unos de abarrotes
             productos.add(new Abarrotes("003", "Arroz", "Morelos", "1Kg", 25.0, 35.0, 100, 20,
                     LocalDate.now().plusMonths(6), "Bolsa"));
             productos.add(new Abarrotes("004", "Frijoles", "La Costeña", "500g", 20.0, 28.0, 80, 15,
                     LocalDate.now().plusMonths(12), "Lata"));
 
-            // Productos Dulcería
+            // Y de dulcería porque siempre se antojan
             productos.add(new Dulceria("005", "Chocolate", "Hershey's", "100g", 12.0, 18.0, 60, 10,
                     "Chocolate"));
-            productos.add(new Dulceria("006", "Gomitas", "Trident", "200g", 15.0, 22.0, 45, 8,
-                    "Gomitas"));
         } catch (Exception e) {
-            System.err.println("Error al inicializar datos de ejemplo: " + e.getMessage());
+            System.err.println("Error al cargar los datos: " + e.getMessage());
         }
     }
 
-    /**
-     * Obtiene todos los productos
-     */
     public List<Producto> obtenerTodosProductos() {
         return new ArrayList<>(productos);
     }
 
-    /**
-     * Obtiene productos por categoría
-     */
     public List<Producto> obtenerProductosPorCategoria(String categoria) {
         try {
             return productos.stream()
                     .filter(p -> {
-                        if (categoria.equals("Frescos")) return p instanceof Frescos;
-                        if (categoria.equals("Abarrotes")) return p instanceof Abarrotes;
-                        if (categoria.equals("Dulcería")) return p instanceof Dulceria;
-                        if (categoria.equals("Limpieza")) return p instanceof Limpieza;
-                        if (categoria.equals("Otros")) return p instanceof Otros;
-                        if (categoria.equals("TiempoAire")) return p instanceof TiempoAire;
+                        if (categoria.equals("Frescos"))
+                            return p instanceof Frescos;
+                        if (categoria.equals("Abarrotes"))
+                            return p instanceof Abarrotes;
+                        if (categoria.equals("Dulcería"))
+                            return p instanceof Dulceria;
+                        if (categoria.equals("Limpieza"))
+                            return p instanceof Limpieza;
+                        if (categoria.equals("Otros"))
+                            return p instanceof Otros;
+                        if (categoria.equals("TiempoAire"))
+                            return p instanceof TiempoAire;
                         return false;
                     })
                     .collect(Collectors.toList());
         } catch (Exception e) {
-            System.err.println("Error al filtrar productos por categoría: " + e.getMessage());
             return new ArrayList<>();
         }
     }
 
     /**
-     * Busca un producto por código de barras
+     * SOBRECARGA DE MÉTODOS (Unidad II):
+     * Aquí busco por el código de barras que es lo más común.
      */
-    public Producto buscarPorCodigoBarras(String codigoBarras) {
+    public Producto buscarProducto(String codigoBarras) {
         try {
-            return productos.stream()
-                    .filter(p -> p.getCodigoBarras().equals(codigoBarras))
-                    .findFirst()
-                    .orElse(null);
+            for (Producto p : productos) {
+                if (p.getCodigoBarras().equals(codigoBarras)) {
+                    return p;
+                }
+            }
+            return null;
         } catch (Exception e) {
-            System.err.println("Error al buscar producto: " + e.getMessage());
             return null;
         }
     }
 
     /**
-     * Agrega un nuevo producto
+     * SOBRECARGA DE MÉTODOS (Unidad II):
+     * También puedo buscar por el número de lista o ID (índice).
      */
-    public boolean agregarProducto(Producto producto) {
+    public Producto buscarProducto(int id) {
         try {
-            if (producto == null) {
-                return false;
+            if (id >= 0 && id < productos.size()) {
+                return productos.get(id);
             }
-            // Verificar que no exista un producto con el mismo código
-            if (buscarPorCodigoBarras(producto.getCodigoBarras()) != null) {
-                return false;
-            }
-            productos.add(producto);
-            return true;
+            return null;
         } catch (Exception e) {
-            System.err.println("Error al agregar producto: " + e.getMessage());
-            return false;
+            return null;
         }
     }
 
     /**
-     * Actualiza un producto existente
+     * SOBRECARGA DE MÉTODOS (Unidad II):
+     * O si no me sé el código, lo busco por su nombre.
      */
+    public Producto buscarProductoPorNombre(String nombre) {
+        try {
+            for (Producto p : productos) {
+                if (p.getNombre().equalsIgnoreCase(nombre)) {
+                    return p;
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public boolean agregarProducto(Producto producto) {
+        try {
+            if (producto == null)
+                return false;
+            if (buscarProducto(producto.getCodigoBarras()) != null)
+                return false;
+            productos.add(producto);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public boolean actualizarProducto(Producto producto) {
         try {
-            if (producto == null) {
+            if (producto == null)
                 return false;
-            }
             int index = productos.indexOf(producto);
             if (index >= 0) {
                 productos.set(index, producto);
@@ -123,24 +145,19 @@ public class ProductoController {
             }
             return false;
         } catch (Exception e) {
-            System.err.println("Error al actualizar producto: " + e.getMessage());
             return false;
         }
     }
 
-    /**
-     * Elimina un producto
-     */
     public boolean eliminarProducto(String codigoBarras) {
         try {
-            Producto producto = buscarPorCodigoBarras(codigoBarras);
+            Producto producto = buscarProducto(codigoBarras);
             if (producto != null) {
                 productos.remove(producto);
                 return true;
             }
             return false;
         } catch (Exception e) {
-            System.err.println("Error al eliminar producto: " + e.getMessage());
             return false;
         }
     }

@@ -1,25 +1,26 @@
- package com.tienda.model;
+package com.tienda.model;
 
 import java.util.Objects;
 
 /**
  * CLASE ABSTRACTA: Producto (Unidad III - Herencia y Polimorfismo)
- * Esta clase sirve como base para todos los productos del sistema.
- * Es 'abstract' porque no tiene sentido instanciar un 'Producto' genérico;
- * siempre debe ser de un tipo específico (Abarrotes, TiempoAire, etc.).
+ * Esta es la clase base de todo mi sistema. La puse abstracta porque no tiene
+ * sentido crear un "Producto" a secas, siempre tiene que ser algo como leche o
+ * frituras.
  */
 public abstract class Producto {
-    // APLICACIÓN DE ENCAPSULAMIENTO (Unidad II):
-    // Usamos 'protected' para que las clases hijas puedan acceder a estos atributos
-    // directamente por herencia, pero manteniéndolos protegidos del exterior.
-    protected String codigoBarras; // Identificador único requerido para el inventario
-    protected String nombre; // Nombre descriptivo del producto
-    protected String marca; // Marca para filtrado y reportes
-    protected String tamanoGramaje; // Información de presentación (ej. 500g, 1L)
-    protected double precioCompra; // Costo por unidad para calcular margen de utilidad
-    protected double precioVenta; // Precio final al cliente
-    protected int stockActual; // Cantidad física disponible en tienda
-    protected int stockMinimo; // Nivel crítico para alertas de resurtido (Unidad V)
+    // ENCAPSULAMIENTO (Unidad II):
+    // Usé private aquí para que nadie de fuera pueda moverle a los datos sin
+    // permiso,
+    // así protejo la integridad de la información de mi programa.
+    private String codigoBarras;
+    private String nombre;
+    private String marca;
+    private String tamanoGramaje;
+    private double precioCompra;
+    private double precioVenta;
+    private int stockActual;
+    private int stockMinimo;
 
     public Producto() {
     }
@@ -37,9 +38,22 @@ public abstract class Producto {
     }
 
     /**
-     * Verifica si hay stock disponible
+     * UNIDAD III - MÉTODO ABSTRACTO:
+     * Este método lo tienen que implementar a fuerzas todos los hijos para
+     * mostrar sus propios datos, aplicando el polimorfismo.
+     */
+    public abstract void mostrarDetalles();
+
+    /**
+     * UNIDAD III - MÉTODO ABSTRACTO:
+     * Cada tipo de producto debe devolver su información única y específica.
+     */
+    public abstract String getDetallesEspecificos();
+
+    /**
+     * Aquí checo si todavía tengo mercancía en la tienda.
      * 
-     * @return true si hay stock suficiente, false en caso contrario
+     * @return true si todavía hay, false si ya se acabó.
      */
     public boolean verificarStock() {
         try {
@@ -50,9 +64,7 @@ public abstract class Producto {
     }
 
     /**
-     * Verifica si el stock está por debajo del mínimo
-     * 
-     * @return true si el stock actual es menor o igual al stock mínimo
+     * Este método me avisa si ya me queda poquito para ir a pedirle al proveedor.
      */
     public boolean necesitaReposicion() {
         try {
@@ -63,10 +75,8 @@ public abstract class Producto {
     }
 
     /**
-     * Calcula el precio con descuento aplicado
-     * 
-     * @param descuento Porcentaje de descuento (0-100)
-     * @return Precio con descuento aplicado
+     * Con esto calculo cuánto va a costar con el descuento que me diga la profe o
+     * el sistema.
      */
     public double calcularPrecioConDescuento(double descuento) {
         try {
@@ -79,7 +89,7 @@ public abstract class Producto {
         }
     }
 
-    // Getters y Setters
+    // Getters y Setters para poder entrar a los datos privados (Encapsulamiento)
     public String getCodigoBarras() {
         return codigoBarras;
     }

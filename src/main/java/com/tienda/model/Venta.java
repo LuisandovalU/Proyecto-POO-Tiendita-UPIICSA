@@ -6,76 +6,85 @@ import java.util.List;
 
 /**
  * CLASE: Venta (Unidad II - Clases y Objetos)
- * Representa el ticket o transacción final de la tienda.
- * 
- * COMENTARIO DE INGENIERÍA: Se migró de LocalDate a LocalDateTime para capturar
- * la precisión de horas y minutos en cada transacción, permitiendo una
- * auditoría en tiempo real exacta y evitando conflictos de tipo en el formateo.
+ * Esta es la clase más importante porque es el ticket de la venta.
+ * Aquí guardo todo lo que el cliente se va a llevar.
  */
 public class Venta implements Cloneable {
-    // RELACIÓN DE COMPOSICIÓN/AGREGACIÓN (Unidad III):
-    // Una Venta 'tiene una' lista de Productos. Sin productos, no hay venta.
-    private static int contadorFolios = 1; // Contador estático para folios correlativos
-    private int folio; // Identificador único de la venta
-    private LocalDateTime fecha; // Fecha de la operación
-    private String formaPago; // Efectivo, Tarjeta, etc. (Unidad I)
-    private double total; // Monto final a pagar
-    private double descuentoAplicado; // Valor ahorrado por el cliente
-    private List<Producto> listaProductos; // Colección de objetos Producto (Polimorfismo)
-    private Promocion promocionAplicada; // Asociación con una promoción opcional
+    // Estas son mis variables compartidas por toda la clase
+    private static int contadorFolios = 1;
 
+    // ENCAPSULAMIENTO (Unidad II):
+    // Todos mis atributos son private para que nadie les mueva nada
+    // por fuera del sistema (protección de datos).
+    private int folio;
+    private LocalDateTime fecha; // Registra la hora exacta (Unidad III)
+    private String formaPago; // Si pagó con lana o tarjeta
+    private double total;
+    private double descuentoAplicado;
+    private List<Producto> listaProductos;
+    private Promocion promocionAplicada;
+
+    /**
+     * SOBRECARGA DE CONSTRUCTORES (Unidad II):
+     * Aquí hice el constructor vacío por si ocupo crear la venta antes
+     * de saber cómo va a pagar el cliente.
+     */
     public Venta() {
         this.folio = contadorFolios++;
-        this.fecha = LocalDateTime.now();
+        this.fecha = LocalDateTime.now(); // Puse LocalDateTime para que no falle la fecha
         this.listaProductos = new ArrayList<>();
         this.total = 0.0;
         this.descuentoAplicado = 0.0;
-        this.promocionAplicada = null;
+        this.formaPago = "Efectivo"; // Por default
     }
 
+    /**
+     * SOBRECARGA DE CONSTRUCTORES (Unidad II):
+     * Este otro constructor me sirve si ya desde el inicio sé cómo van a pagar.
+     */
     public Venta(String formaPago) {
         this();
         this.formaPago = formaPago;
     }
 
+    /**
+     * Este método lo hice para ir metiendo los productos al carrito.
+     * Uso polimorfismo porque puedo meter CUALQUIER producto al mismo tiempo.
+     */
     public void agregarProducto(Producto producto) {
         try {
             if (producto != null && producto.verificarStock()) {
-                // --- UNIDAD III: POLIMORFISMO Y LÓGICA DE NEGOCIO ---
-                // Aplicamos Polimorfismo y Lógica de Negocio de la Unidad III para que el
-                // sistema decida el precio final dinámicamente.
-                // REGLA DE ORO: Si es Frescos y caduca pronto, aplicamos el 'Remate de
-                // Frescos'.
+                // Aquí checo si es un producto fresco para ver si le bajo el precio
+                // Este es un ejemplo de cómo uso el polimorfismo (instanceof)
                 if (producto instanceof Frescos) {
                     Frescos f = (Frescos) producto;
                     if (f.verificarCaducidad() && promocionAplicada == null) {
-                        System.out.println("Sugerencia del Sistema: Aplicando 'Remate de Frescos' (20% OFF)");
-                        // Creamos una promoción virtual de remate inmediata (Unidad II)
+                        System.out.println("Liquidación: Este fresco está por vencer, 20% menos!");
                         Promocion remate = new Promocion("Remate de Frescos", 20.0, java.time.LocalDate.now(),
                                 java.time.LocalDate.now().plusDays(1));
                         remate.getListaProductos().add(f);
                         this.promocionAplicada = remate;
                     }
                 }
-
                 listaProductos.add(producto);
                 calcularTotal();
             }
         } catch (Exception e) {
-            System.err.println("Error al agregar producto a la venta: " + e.getMessage());
+            System.err.println("Error al agregar al carrito: " + e.getMessage());
         }
     }
 
     /**
-     * Calcula el total de la venta aplicando promociones si existen
+     * Con este método saco la cuenta de cuánto va a ser el total.
      */
     private void calcularTotal() {
         try {
-            double subtotal = listaProductos.stream()
-                    .mapToDouble(Producto::getPrecioVenta)
-                    .sum();
+            double subtotal = 0;
+            for (Producto p : listaProductos) {
+                subtotal += p.getPrecioVenta();
+            }
 
-            // Aplicar promoción si existe y está activa
+            // Si hay promo, la aplico aquí
             if (promocionAplicada != null && promocionAplicada.estaActiva()) {
                 double totalConDescuento = 0.0;
                 for (Producto producto : listaProductos) {
@@ -92,16 +101,10 @@ public class Venta implements Cloneable {
                 this.total = subtotal;
             }
         } catch (Exception e) {
-            System.err.println("Error al calcular total: " + e.getMessage());
             this.total = 0.0;
         }
     }
 
-    /**
-     * Aplica una promoción a la venta
-     * 
-     * @param promocion Promoción a aplicar
-     */
     public void aplicarPromocion(Promocion promocion) {
         try {
             if (promocion != null && promocion.estaActiva()) {
@@ -109,68 +112,50 @@ public class Venta implements Cloneable {
                 calcularTotal();
             }
         } catch (Exception e) {
-            System.err.println("Error al aplicar promoción: " + e.getMessage());
+            System.err.println("Error en la promo: " + e.getMessage());
         }
     }
 
     /**
-     * Finaliza la venta y actualiza el stock.
-     * --- POLIMORFISMO Y LÓGICA DE UNIDAD IV ---
-     * Antes de cerrar, revisamos si existen productos frescos próximos a caducar
-     * para aplicar un descuento del 20% automáticamente si no tienen promoción.
+     * Este método cierra la venta y baja el stock de la tienda.
      */
     public void finalizarVenta() {
         try {
             double totalDescuentoExtra = 0.0;
-
             for (Producto producto : listaProductos) {
-                // REDUCCIÓN DE STOCK:
+                // Bajo el stock de mi inventario físico
                 if (producto.getStockActual() > 0) {
                     producto.setStockActual(producto.getStockActual() - 1);
                 }
 
-                // POLIMORFISMO (Unidad III):
-                // Identificamos dinámicamente si el producto es de tipo Frescos.
+                // Aquí aplico la Unidad III (Polimorfismo) para ver tipos de productos
                 if (producto instanceof Frescos) {
                     Frescos f = (Frescos) producto;
-                    // REGLA DE NEGOCIO: Si vence pronto, aplicamos descuento de liquidación.
                     if (f.verificarCaducidad() && promocionAplicada == null) {
-                        double descuento = f.getPrecioVenta() * 0.20; // 20% de descuento
+                        double descuento = f.getPrecioVenta() * 0.20;
                         totalDescuentoExtra += descuento;
-                        System.out.println("Liquidación aplicada a: " + f.getNombre());
                     }
                 }
             }
-
-            // Ajustamos el total final con los descuentos por caducidad
             this.descuentoAplicado += totalDescuentoExtra;
             this.total -= totalDescuentoExtra;
-
         } catch (Exception e) {
-            System.err.println("Error al finalizar venta: " + e.getMessage());
+            System.err.println("Error al terminar la venta: " + e.getMessage());
         }
     }
 
-    /**
-     * Implementación de Clonación Profunda (Unidad II/III)
-     * Permite guardar el estado de la venta en el historial sin que cambios
-     * posteriores afecten el registro.
-     */
     @Override
     public Venta clone() {
         try {
             Venta clon = (Venta) super.clone();
-            // Clonamos la lista de productos para asegurar independencia (Clonación
-            // Profunda)
             clon.listaProductos = new ArrayList<>(this.listaProductos);
             return clon;
         } catch (CloneNotSupportedException e) {
-            System.err.println("Error al clonar venta: " + e.getMessage());
             return null;
         }
     }
 
-    // Getters y Setters
+    // Mis Getters y Setters para entrar a los datos privados
     public int getFolio() {
         return folio;
     }

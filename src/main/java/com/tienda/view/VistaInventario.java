@@ -108,7 +108,7 @@ public class VistaInventario extends JPanel {
             return;
         }
         String codigo = (String) modeloProductos.getValueAt(fila, 0);
-        Producto p = productoController.buscarPorCodigoBarras(codigo);
+        Producto p = productoController.buscarProducto(codigo);
         mostrarDialogoProducto(p);
     }
 

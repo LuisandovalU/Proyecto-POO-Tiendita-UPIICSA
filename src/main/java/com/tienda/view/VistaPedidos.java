@@ -256,7 +256,7 @@ public class VistaPedidos extends JPanel {
                 }
 
                 for (java.util.Map.Entry<String, Integer> entry : cantidadPorProducto.entrySet()) {
-                    Producto producto = productoController.buscarPorCodigoBarras(entry.getKey());
+                    Producto producto = productoController.buscarProducto(entry.getKey());
                     if (producto != null) {
                         Object[] fila = {
                                 producto.getNombre(),
@@ -301,7 +301,7 @@ public class VistaPedidos extends JPanel {
             }
 
             String codigoBarras = (String) modeloProductos.getValueAt(filaSeleccionada, 0);
-            Producto producto = productoController.buscarPorCodigoBarras(codigoBarras);
+            Producto producto = productoController.buscarProducto(codigoBarras);
 
             if (producto == null) {
                 JOptionPane.showMessageDialog(this,

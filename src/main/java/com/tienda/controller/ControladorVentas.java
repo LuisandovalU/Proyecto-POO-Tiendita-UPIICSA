@@ -10,19 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Controlador para gestionar ventas (ControladorVentas)
- * Integra la aplicación de promociones y la persistencia en memoria del
- * historial.
- * 
- * COMENTARIO DE INGENIERÍA: Se implementó un patrón de mediación simple para
- * sincronizar
- * las vistas del Vendedor y el Administrador, garantizando la integridad del
- * historial
- * de auditoría.
+ * CONTROLADOR: ControladorVentas (Unidad V - MVC)
+ * Este es el controlador para las ventas. Aquí manejo cuando alguien compra
+ * algo, se guarda en el historial y se bajan las existencias.
  */
 public class ControladorVentas {
-    private List<Venta> ventas; // Lista de ventas de la sesión (legacy)
-    private ArrayList<Venta> historialGlobal; // Requerimiento: Persistencia del historial
+    private List<Venta> ventas;
+    private ArrayList<Venta> historialGlobal; // Para que no se borren mis ventas
     private Venta ventaActual;
     private PromocionController promocionController;
     private DecimalFormat df = new DecimalFormat("#,##0.00");
@@ -43,20 +37,18 @@ public class ControladorVentas {
     }
 
     /**
-     * Inicia una nueva venta
+     * Cuando llega un cliente, inicio una nueva venta.
      */
     public void iniciarVenta() {
         try {
             ventaActual = new Venta();
         } catch (Exception e) {
-            System.err.println("Error al iniciar venta: " + e.getMessage());
             ventaActual = new Venta();
         }
     }
 
     /**
-     * Agrega un producto a la venta actual
-     * Aplica promociones automáticamente si existen
+     * Meto productos a la cuenta del cliente.
      */
     public boolean agregarProductoAVenta(Producto producto, int cantidad) {
         try {
@@ -66,6 +58,7 @@ public class ControladorVentas {
             if (producto == null || cantidad <= 0) {
                 return false;
             }
+            // Checo si tengo suficiente en la bodega (Unidad I - Reglas)
             if (!producto.verificarStock() || producto.getStockActual() < cantidad) {
                 return false;
             }
@@ -73,24 +66,19 @@ public class ControladorVentas {
                 ventaActual.agregarProducto(producto);
             }
 
-            // Aplicar promoción si existe para este producto (Unidad III: Polimorfismo)
+            // Aplicamos polimorfismo para ver si hay promos para este producto
             if (promocionController != null) {
                 Promocion promocion = promocionController.buscarPromocionParaProducto(producto);
                 if (promocion != null && promocion.isVigente()) {
                     ventaActual.aplicarPromocion(promocion);
                 }
             }
-
             return true;
         } catch (Exception e) {
-            System.err.println("Error al agregar producto a venta: " + e.getMessage());
             return false;
         }
     }
 
-    /**
-     * Obtiene la venta actual
-     */
     public Venta getVentaActual() {
         if (ventaActual == null) {
             iniciarVenta();
@@ -99,7 +87,8 @@ public class ControladorVentas {
     }
 
     /**
-     * Finaliza la venta actual y realiza la persistencia en el historial.
+     * SOBRECARGA DE MÉTODOS (Unidad II):
+     * Este finaliza la venta diciéndole cómo pagó.
      */
     public boolean finalizarVenta(String formaPago) {
         try {
@@ -107,32 +96,38 @@ public class ControladorVentas {
                 return false;
             }
 
-            // 1. Asignar fecha actual y forma de pago
+            // Le pongo la fecha de hoy con hora exacta (Unidad III)
             ventaActual.setFormaPago(formaPago);
-            // La fecha ya se asigna en el constructor de Venta (LocalDate.now())
+            ventaActual.setFecha(java.time.LocalDateTime.now());
 
-            // 2. Finalizar la venta (calcula totales y resta stock)
+            // Llamo al método de la clase Venta
             ventaActual.finalizarVenta();
 
-            // 3. Clonar el objeto Venta actual y añadirlo al historialGlobal (Persistencia)
+            // CLONACIÓN (Unidad II): Guardo una copia en el historial
             Venta ventaParaHistorial = ventaActual.clone();
             if (ventaParaHistorial != null) {
                 historialGlobal.add(ventaParaHistorial);
-                ventas.add(ventaParaHistorial); // Mantener compatibilidad
+                ventas.add(ventaParaHistorial);
             }
 
-            // 4. Limpiar el carrito para la siguiente venta
+            // Limpio para el que sigue
             ventaActual = null;
-
             return true;
         } catch (Exception e) {
-            System.err.println("Error al finalizar venta: " + e.getMessage());
             return false;
         }
     }
 
     /**
-     * Actualización de la Vista (Unidad IV): Refresca la tabla del historial.
+     * SOBRECARGA DE MÉTODOS (Unidad II):
+     * Si no me dicen cómo pagó, asumo que fue en efectivo.
+     */
+    public boolean finalizarVenta() {
+        return finalizarVenta("Efectivo");
+    }
+
+    /**
+     * Con esto lleno la tabla que ve el Administrador (Unidad IV - GUI).
      */
     public void actualizarTablaHistorial(DefaultTableModel modeloHistorial) {
         try {
@@ -151,33 +146,20 @@ public class ControladorVentas {
                 modeloHistorial.addRow(fila);
             }
         } catch (Exception e) {
-            System.err.println("Error al actualizar tabla de historial: " + e.getMessage());
+            System.err.println("Error al llenar la tabla: " + e.getMessage());
         }
     }
 
-    /**
-     * Cancela la venta actual
-     */
     public void cancelarVenta() {
-        try {
-            ventaActual = null;
-        } catch (Exception e) {
-            System.err.println("Error al cancelar venta: " + e.getMessage());
-        }
+        ventaActual = null;
     }
 
-    /**
-     * Obtiene todas las ventas realizadas
-     * DEBUG: Imprime el tamaño de la lista para verificar persistencia.
-     */
     public List<Venta> obtenerTodasVentas() {
-        System.out.println("DEBUG: Ventas en historial (ventas): " + ventas.size());
-        System.out.println("DEBUG: Ventas en historial (historialGlobal): " + historialGlobal.size());
         return new ArrayList<>(historialGlobal);
     }
 
     /**
-     * Elimina un producto de la venta actual
+     * Si el cliente se arrepiente, quito el producto de la cuenta.
      */
     public boolean eliminarProductoDeVenta(Producto producto) {
         try {
@@ -191,7 +173,6 @@ public class ControladorVentas {
             }
             return false;
         } catch (Exception e) {
-            System.err.println("Error al eliminar producto de venta: " + e.getMessage());
             return false;
         }
     }

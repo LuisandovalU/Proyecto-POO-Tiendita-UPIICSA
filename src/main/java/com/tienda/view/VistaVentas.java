@@ -296,7 +296,7 @@ public class VistaVentas extends JPanel {
     private void agregarProductoAlCarrito(int fila) {
         try {
             String codigoBarras = (String) modeloProductos.getValueAt(fila, 0);
-            Producto producto = productoController.buscarPorCodigoBarras(codigoBarras);
+            Producto producto = productoController.buscarProducto(codigoBarras);
 
             if (producto == null) {
                 JOptionPane.showMessageDialog(this,
