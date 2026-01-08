@@ -46,6 +46,15 @@ public class VistaPedidos extends JPanel {
         this.proveedorController = proveedorController;
         this.productoController = productoController;
 
+        // Aquí conecté todo para que si doy de alta un producto, ya salga en pedidos y
+        // en promociones sin tener que reiniciar el programa. Así el Admin ahorra
+        // tiempo.
+        // Me suscribo a los cambios para que si agregan algo en la otra pestaña, aquí
+        // salga al tiro.
+        this.productoController.addChangeListener(() -> {
+            actualizarTablaProductos();
+        });
+
         setLayout(new BorderLayout(10, 10));
         setBackground(new Color(45, 45, 45));
 

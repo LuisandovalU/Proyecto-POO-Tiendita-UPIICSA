@@ -18,6 +18,7 @@ public class Frescos extends Producto {
     private boolean seVendePorGramos; // Aquí separé los frescos que se venden por pieza de los que pesamos, como el
                                       // jamón, para que el inventario por gramos sea exacto y no se pierda dinero
     private double pesoPorPiezaGramos; // ej. una barra de jamón pesa 4000g
+    private boolean esVentaPorPeso; // Si es true, se vende por gramos aunque se compre por barra/pieza
 
     public Frescos() {
         super();
@@ -49,7 +50,7 @@ public class Frescos extends Producto {
         // POLIMORFISMO (Unidad III):
         // Si el producto se vende por gramos, calculamos el proporcional.
         // Aquí le puse esta cuenta porque los jamones son un relajo si no los pesas.
-        if (seVendePorGramos) {
+        if (seVendePorGramos || esVentaPorPeso) {
             return (super.getPrecioVenta() / 1000.0) * cantidadGramos;
         }
         return super.getPrecioVenta();
@@ -57,7 +58,8 @@ public class Frescos extends Producto {
 
     @Override
     public String getDetallesEspecificos() {
-        return "Caducidad: " + fechaCaducidad + ", Refri: " + (requiereRefrigeracion ? "Sí" : "No");
+        return "Caducidad: " + fechaCaducidad + ", Refri: " + (requiereRefrigeracion ? "Sí" : "No") +
+                ", Venta: " + (esVentaPorPeso ? "Por Peso" : "Por Pieza");
     }
 
     /**
@@ -127,6 +129,14 @@ public class Frescos extends Producto {
 
     public void setPesoPorPiezaGramos(double pesoPorPiezaGramos) {
         this.pesoPorPiezaGramos = pesoPorPiezaGramos;
+    }
+
+    public boolean isEsVentaPorPeso() {
+        return esVentaPorPeso;
+    }
+
+    public void setEsVentaPorPeso(boolean esVentaPorPeso) {
+        this.esVentaPorPeso = esVentaPorPeso;
     }
 
     @Override

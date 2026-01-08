@@ -17,10 +17,54 @@ public class ProductoController {
     // Mi lista de productos (Persistencia volátil por ahora, no me maten si se
     // borra)
     private List<Producto> productos;
+    private List<ProductoChangeListener> listeners;
+
+    /**
+     * Interfaz para que las vistas se enteren cuando algo cambia en los productos.
+     * Como el chisme en la escuela, si alguien sabe algo, todos se enteran.
+     */
+    public interface ProductoChangeListener {
+        void onProductoChanged();
+    }
 
     public ProductoController() {
         this.productos = new ArrayList<>();
+        this.listeners = new ArrayList<>();
         inicializarDatosEjemplo();
+    }
+
+    public void addChangeListener(ProductoChangeListener listener) {
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+        }
+    }
+
+    private void notifyListeners() {
+        for (ProductoChangeListener listener : listeners) {
+            listener.onProductoChanged();
+        }
+    }
+
+    /**
+     * Aquí genero el código manual que pide el punto 1 del requerimiento para uso
+     * interno de la tienda.
+     * Si no tienen código de barras, les invento uno prolijo.
+     */
+    private String generarCodigoInterno() {
+        int max = 0;
+        for (Producto p : productos) {
+            if (p.getCodigoBarras() != null && p.getCodigoBarras().startsWith("INT-")) {
+                try {
+                    int num = Integer.parseInt(p.getCodigoBarras().substring(4));
+                    if (num > max) {
+                        max = num;
+                    }
+                } catch (NumberFormatException e) {
+                    // Ignoramos si el formato no es exacto
+                }
+            }
+        }
+        return String.format("INT-%04d", max + 1);
     }
 
     /**
@@ -139,10 +183,17 @@ public class ProductoController {
         try {
             if (producto == null)
                 return false;
+
+            // Si el Admin no puso código, le creamos uno nosotros
+            if (producto.getCodigoBarras() == null || producto.getCodigoBarras().trim().isEmpty()) {
+                producto.setCodigoBarras(generarCodigoInterno());
+            }
+
             // No podemos tener dos productos con el mismo código, eso sería un relajo.
             if (buscarProducto(producto.getCodigoBarras()) != null)
                 return false;
             productos.add(producto);
+            notifyListeners();
             return true;
         } catch (Exception e) {
             return false;
@@ -156,6 +207,7 @@ public class ProductoController {
             int index = productos.indexOf(producto);
             if (index >= 0) {
                 productos.set(index, producto);
+                notifyListeners();
                 return true;
             }
             return false;
@@ -169,6 +221,7 @@ public class ProductoController {
             Producto producto = buscarProducto(codigoBarras);
             if (producto != null) {
                 productos.remove(producto);
+                notifyListeners();
                 return true;
             }
             return false;

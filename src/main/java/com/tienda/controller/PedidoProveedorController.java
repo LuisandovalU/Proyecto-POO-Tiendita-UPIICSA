@@ -119,7 +119,9 @@ public class PedidoProveedorController {
                         incrementoStock = ((Abarrotes) productoPedido).getUnidadesPorPaquete();
                         if (incrementoStock <= 0)
                             incrementoStock = 1; // Fallback por si no se configuró
-                    } else if (productoPedido instanceof Frescos && ((Frescos) productoPedido).isSeVendePorGramos()) {
+                    } else if (productoPedido instanceof Frescos &&
+                            (((Frescos) productoPedido).isSeVendePorGramos()
+                                    || ((Frescos) productoPedido).isEsVentaPorPeso())) {
                         // REQUERIMIENTO: Si es por peso, sumamos los gramos de la pieza
                         incrementoStock = (int) ((Frescos) productoPedido).getPesoPorPiezaGramos();
                     }

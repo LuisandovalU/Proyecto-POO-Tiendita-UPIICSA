@@ -34,6 +34,15 @@ public class VistaGestionPromociones extends JPanel {
         this.productoController = prodCtrl;
         this.promocionController = promoCtrl;
         this.usuarioController = userCtrl;
+
+        // Aquí conecté todo para que si doy de alta un producto, ya salga en pedidos y
+        // en promociones sin tener que reiniciar el programa. Así el Admin ahorra
+        // tiempo.
+        // Me suscribo a los cambios del catálogo para que la tabla se actualice sola.
+        this.productoController.addChangeListener(() -> {
+            actualizarTabla();
+        });
+
         inicializarComponentes();
     }
 

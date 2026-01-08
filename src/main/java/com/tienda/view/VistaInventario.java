@@ -2,6 +2,7 @@ package com.tienda.view;
 
 import com.tienda.controller.ProductoController;
 import com.tienda.model.Producto;
+import com.tienda.model.Frescos;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -22,6 +23,13 @@ public class VistaInventario extends JPanel {
 
     public VistaInventario(ProductoController productoController) {
         this.productoController = productoController;
+
+        // También me suscribo aquí por si acaso, para que el inventario siempre esté al
+        // día
+        // sin tener que picarle al botón de actualizar.
+        this.productoController.addChangeListener(() -> {
+            actualizarTabla();
+        });
 
         setLayout(new BorderLayout(10, 10));
         setBackground(new Color(45, 45, 45));
@@ -150,6 +158,10 @@ public class VistaInventario extends JPanel {
         JTextField txtStockM = new JTextField(p != null ? String.valueOf(p.getStockMinimo()) : "0");
         JComboBox<String> comboTipo = new JComboBox<>(
                 new String[] { "Abarrotes", "Frescos", "Dulcería", "Limpieza", "Otros" });
+        JCheckBox chkVentaPeso = new JCheckBox("Venta por Peso (Jamón/Queso)");
+        if (p instanceof Frescos) {
+            chkVentaPeso.setSelected(((Frescos) p).isEsVentaPorPeso());
+        }
 
         if (p != null) {
             txtCodigo.setEnabled(false);
@@ -175,6 +187,8 @@ public class VistaInventario extends JPanel {
         panel.add(txtStockM);
         panel.add(new JLabel("Tipo:"));
         panel.add(comboTipo);
+        panel.add(new JLabel("Ajuste Cremería:"));
+        panel.add(chkVentaPeso);
 
         int result = JOptionPane.showConfirmDialog(this, panel, p == null ? "Agregar Producto" : "Editar Producto",
                 JOptionPane.OK_CANCEL_OPTION);
@@ -209,6 +223,13 @@ public class VistaInventario extends JPanel {
                 nuevo.setPrecioVenta(Double.parseDouble(txtPrecioV.getText()));
                 nuevo.setStockActual(Integer.parseInt(txtStockA.getText()));
                 nuevo.setStockMinimo(Integer.parseInt(txtStockM.getText()));
+
+                if (nuevo instanceof Frescos) {
+                    ((Frescos) nuevo).setEsVentaPorPeso(chkVentaPeso.isSelected());
+                    if (chkVentaPeso.isSelected()) {
+                        ((Frescos) nuevo).setUnidadVenta("Gramos");
+                    }
+                }
 
                 if (p == null) {
                     productoController.agregarProducto(nuevo);

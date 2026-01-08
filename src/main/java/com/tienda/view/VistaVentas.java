@@ -20,6 +20,8 @@ import java.text.DecimalFormat;
  * se vea bonito porque si no la profe nos baja puntos.
  */
 public class VistaVentas extends JPanel {
+    // Le puse mucho énfasis a los frescos porque, como son perecederos y necesitan
+    // refri, el riesgo de pérdida es mayor si no cuidamos la caducidad.
     private ProductoController productoController;
     private ControladorVentas ventaController;
 
@@ -278,9 +280,15 @@ public class VistaVentas extends JPanel {
             }
 
             for (Producto producto : productos) {
+                String nombreMostrado = producto.getNombre();
+                if (producto instanceof Frescos && ((Frescos) producto).verificarCaducidad()) {
+                    nombreMostrado = "<html><font color='red'>[PRÓXIMO A CADUCAR] " + producto.getNombre()
+                            + "</font></html>";
+                }
+
                 Object[] fila = {
                         producto.getCodigoBarras(),
-                        producto.getNombre(),
+                        nombreMostrado,
                         producto.getMarca(),
                         "$" + df.format(producto.getPrecioVenta()),
                         producto.getStockActual(),
