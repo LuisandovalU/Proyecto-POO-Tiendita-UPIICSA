@@ -45,15 +45,35 @@ public class Frescos extends Producto {
         System.out.println("Venta por: " + unidadVenta);
     }
 
+    /**
+     * UNIDAD III - POLIMORFISMO:
+     * Aquí hice la conversión de la báscula: divido el precio del kilo entre 1000
+     * y lo multiplico por lo que pesó la rebanada. Así el cobro es exacto.
+     */
+    public double calcularPrecioPorGramos(double gramos) {
+        return (super.getPrecioVenta() / 1000.0) * gramos;
+    }
+
     @Override
     public double getPrecioVenta() {
         // POLIMORFISMO (Unidad III):
         // Si el producto se vende por gramos, calculamos el proporcional.
         // Aquí le puse esta cuenta porque los jamones son un relajo si no los pesas.
         if (seVendePorGramos || esVentaPorPeso) {
-            return (super.getPrecioVenta() / 1000.0) * cantidadGramos;
+            return calcularPrecioPorGramos(cantidadGramos);
         }
         return super.getPrecioVenta();
+    }
+
+    @Override
+    public double calcularPrecioConDescuento(double descuento) {
+        // Aseguramos que el descuento se aplique sobre el precio proporcional
+        // si es un producto vendido por peso.
+        double precioActual = getPrecioVenta();
+        if (descuento < 0 || descuento > 100) {
+            return precioActual;
+        }
+        return precioActual * (1 - descuento / 100.0);
     }
 
     @Override

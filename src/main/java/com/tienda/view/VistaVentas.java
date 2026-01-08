@@ -332,7 +332,7 @@ public class VistaVentas extends JPanel {
                 // Si el producto es por gramos, preguntamos el peso.
                 if (frescos.isSeVendePorGramos()) {
                     String gramosStr = JOptionPane.showInputDialog(this,
-                            "¿Cuántos gramos desea vender?",
+                            "Ingrese cantidad en gramos",
                             "Venta por Peso",
                             JOptionPane.QUESTION_MESSAGE);
 
@@ -401,6 +401,13 @@ public class VistaVentas extends JPanel {
             if (venta != null) {
                 for (Producto producto : venta.getListaProductos()) {
                     String nombreMostrado = producto.getNombre();
+
+                    if (producto instanceof Frescos
+                            && (((Frescos) producto).isSeVendePorGramos() || ((Frescos) producto).isEsVentaPorPeso())) {
+                        Frescos f = (Frescos) producto;
+                        nombreMostrado = f.getNombre() + " (" + (int) f.getCantidadGramos() + "g)";
+                    }
+
                     String precioMostrado = "$" + df.format(producto.getPrecioVenta());
 
                     // Verificamos si tiene descuento aplicado (Polimorfismo Unidad III)
@@ -409,14 +416,14 @@ public class VistaVentas extends JPanel {
                     if (venta.getPromocionAplicada() != null
                             && venta.getPromocionAplicada().aplicaAProducto(producto)) {
                         double precioConDesc = venta.getPromocionAplicada().calcularPrecioConDescuento(producto);
-                        nombreMostrado = "<html><font color='orange'>[OFERTA]</font> " + producto.getNombre()
+                        nombreMostrado = "<html><font color='orange'>[OFERTA]</font> " + nombreMostrado
                                 + "</html>";
                         precioMostrado = "<html><strike>$" + df.format(producto.getPrecioVenta())
                                 + "</strike> <font color='green'>$" + df.format(precioConDesc) + "</font></html>";
                     } else if (producto instanceof Frescos && ((Frescos) producto).verificarCaducidad()) {
                         // Caso de liquidación automática por caducidad
                         double precioLiquidacion = producto.getPrecioVenta() * 0.8;
-                        nombreMostrado = "<html><font color='red'>[REMATE DE FRESCOS]</font> " + producto.getNombre()
+                        nombreMostrado = "<html><font color='red'>[REMATE DE FRESCOS]</font> " + nombreMostrado
                                 + "</html>";
                         precioMostrado = "<html><strike>$" + df.format(producto.getPrecioVenta())
                                 + "</strike> <font color='green'>$" + df.format(precioLiquidacion) + "</font></html>";

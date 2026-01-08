@@ -30,7 +30,7 @@ public class ProductoController {
     public ProductoController() {
         this.productos = new ArrayList<>();
         this.listeners = new ArrayList<>();
-        inicializarDatosEjemplo();
+        cargarDatosIniciales();
     }
 
     public void addChangeListener(ProductoChangeListener listener) {
@@ -68,29 +68,84 @@ public class ProductoController {
     }
 
     /**
-     * Lleno la lista con unos productos para que la profe vea que sí funciona y no
+     * Lleno la lista con 30 productos para que la profe vea que sí funciona y no
      * salga la tabla vacía. Me aseguré de meter de todas las categorías.
      */
-    private void inicializarDatosEjemplo() {
+    private void cargarDatosIniciales() {
+        // Separé bien las clases para que se vea la herencia. No es lo mismo un jabón
+        // de limpieza que un dulce, aunque ambos se vendan por pieza
         try {
-            // Meto unos frescos. Usé polimorfismo aquí para meterlos a la lista de
-            // "Producto".
-            productos.add(new Frescos("001", "Leche Entera", "Lala", "1L", 15.0, 20.0, 50, 10,
-                    LocalDate.now().plusDays(7), true, "Litro"));
-            productos.add(new Frescos("002", "Yogurt Natural", "Danone", "1Kg", 18.0, 25.0, 30, 5,
-                    LocalDate.now().plusDays(5), true, "Kilogramo"));
+            // 6 DULCERÍA (Compra por caja, venta por pieza - DUL-XXX)
+            productos.add(new Dulceria("DUL-001", "Chicles Trident", "Trident", "12pz", 100.0, 1.5, 500, 100,
+                    "Goma de Mascar"));
+            productos.add(
+                    new Dulceria("DUL-002", "Chocolate Carlos V", "Nestlé", "1pz", 80.0, 10.0, 200, 50, "Chocolate"));
+            productos.add(
+                    new Dulceria("DUL-003", "Gomitas Panditas", "Ricolino", "65g", 120.0, 15.0, 150, 40, "Gomitas"));
+            productos
+                    .add(new Dulceria("DUL-004", "Paletas Payaso", "Ricolino", "1pz", 150.0, 25.0, 100, 20, "Paletas"));
+            productos.add(new Dulceria("DUL-005", "Bubbaloo Fresa", "Adams", "1pz", 45.0, 1.0, 600, 100, "Chicle"));
+            productos.add(
+                    new Dulceria("DUL-006", "Mazapán Gigante", "De la Rosa", "1pz", 90.0, 8.0, 300, 60, "Mazapán"));
 
-            // Unos de abarrotes. Heredan de producto así que entran sin fallas.
-            productos.add(new Abarrotes("003", "Arroz", "Morelos", "1Kg", 25.0, 35.0, 100, 20,
-                    LocalDate.now().plusMonths(6), "Bolsa"));
-            productos.add(new Abarrotes("004", "Frijoles", "La Costeña", "500g", 20.0, 28.0, 80, 15,
-                    LocalDate.now().plusMonths(12), "Lata"));
+            // 6 LIMPIEZA (Compra por caja, venta por unidad - LIM-XXX)
+            productos.add(new Limpieza("LIM-001", "Jabón Axion", "Colgate", "400g", 240.0, 28.0, 100, 25,
+                    "Lavar trastes directamente sobre esponja"));
+            productos.add(new Limpieza("LIM-002", "Suavizante Downy", "P&G", "800ml", 360.0, 45.0, 60, 15,
+                    "Mezclar con agua en el último ciclo"));
+            productos.add(new Limpieza("LIM-003", "Jerga Gris", "Generica", "1pz", 100.0, 22.0, 80, 20,
+                    "Lavar con cloro después de usar"));
+            productos.add(new Limpieza("LIM-004", "Estropajo Fibra", "Scotch-Brite", "1pz", 180.0, 18.0, 120, 30,
+                    "No usar en superficies de teflón"));
+            productos.add(new Limpieza("LIM-005", "Cloro Líquido", "Los Arcos", "1L", 150.0, 18.0, 150, 40,
+                    "No mezclar con amoníaco"));
+            productos.add(new Limpieza("LIM-006", "Desengrasante", "Easy-Off", "500ml", 420.0, 65.0, 30, 8,
+                    "Rociar y dejar actuar 5 minutos"));
 
-            // Y de dulcería porque siempre se antojan.
-            productos.add(new Dulceria("005", "Chocolate", "Hershey's", "100g", 12.0, 18.0, 60, 10,
-                    "Chocolate"));
+            // 2 OTROS (OTR-XXX)
+            productos.add(new Otros("OTR-001", "Velas Decorativas", "Velas AR", "3pz", 40.0, 15.0, 40, 10,
+                    "Velas de cera para decoración"));
+            productos.add(new Otros("OTR-002", "Encendedor Bic", "Bic", "1pz", 12.0, 18.0, 100, 25,
+                    "Encendedor de gas desechable"));
+
+            // 6 ABARROTES (Compra por paquete, venta por pieza - ABR-XXX)
+            productos.add(new Abarrotes("ABR-001", "Atún en Agua", "Dolores", "140g", 180.0, 22.0, 200, 40,
+                    LocalDate.now().plusMonths(24), "Lata"));
+            productos.add(new Abarrotes("ABR-002", "Sopa de Fideo", "La Moderna", "200g", 85.0, 9.5, 300, 60,
+                    LocalDate.now().plusMonths(12), "Bolsa"));
+            productos.add(new Abarrotes("ABR-003", "Aceite Vegetal", "1-2-3", "1L", 420.0, 48.0, 100, 20,
+                    LocalDate.now().plusMonths(12), "Botella"));
+            productos.add(new Abarrotes("ABR-004", "Frijol Negro", "Isadora", "430g", 160.0, 20.0, 150, 30,
+                    LocalDate.now().plusMonths(10), "Sobre"));
+            productos.add(new Abarrotes("ABR-005", "Arroz Blanco", "Schettino", "900g", 240.0, 32.0, 120, 25,
+                    LocalDate.now().plusMonths(8), "Bolsa"));
+            productos.add(new Abarrotes("ABR-006", "Mayonesa", "McCormick", "390g", 480.0, 55.0, 80, 15,
+                    LocalDate.now().plusMonths(18), "Frasco"));
+
+            // 10 FRESCOS (5 por peso, 5 por pieza - FRE-XXX)
+            // Por peso
+            String[] nombresPeso = { "Jamón de Pierna", "Queso Oaxaca", "Salchicha Pavo", "Pechuga Pavo",
+                    "Queso Panela" };
+            for (int i = 0; i < 5; i++) {
+                Frescos f = new Frescos("FRE-000" + (i + 1), nombresPeso[i], "Varios", "Kg", 100.0 + (i * 20),
+                        160.0 + (i * 30), 5000, 1000, LocalDate.now().plusDays(10), true, "Gramo");
+                f.setSeVendePorGramos(true);
+                productos.add(f);
+            }
+            // Por pieza
+            productos.add(new Frescos("FRE-0006", "Leche Entera", "Lala", "1L", 22.0, 28.0, 60, 12,
+                    LocalDate.now().plusDays(15), true, "Litro"));
+            productos.add(new Frescos("FRE-0007", "Crema Ácida", "Alpura", "450ml", 25.0, 34.0, 40, 10,
+                    LocalDate.now().plusDays(10), true, "Pieza"));
+            productos.add(new Frescos("FRE-0008", "Yogurt Natural", "Danone", "900g", 30.0, 42.0, 30, 5,
+                    LocalDate.now().plusDays(12), true, "Pieza"));
+            productos.add(new Frescos("FRE-0009", "Mantequilla", "Lala", "90g", 15.0, 22.0, 50, 10,
+                    LocalDate.now().plusDays(30), true, "Pieza"));
+            productos.add(new Frescos("FRE-0010", "Jugo Fresco", "Jumex", "1L", 18.0, 25.0, 45, 10,
+                    LocalDate.now().plusDays(5), true, "Pieza"));
+
         } catch (Exception e) {
-            System.err.println("Error al cargar los datos: " + e.getMessage());
+            System.err.println("Error al cargar los datos iniciales: " + e.getMessage());
         }
     }
 
