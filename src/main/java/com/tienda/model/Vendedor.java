@@ -16,34 +16,11 @@ public class Vendedor extends Usuario {
     }
 
     /**
-     * Permisos del vendedor según requerimientos:
-     * - Administrar ventas de productos
-     * - Cobrar y dar cambio
-     * - Procesar devoluciones (solo si el producto está en mal estado)
+     * El Vendedor solo puede entrar a la pestaña de Ventas.
      * Aplicación de polimorfismo: implementa el método abstracto de Usuario
      */
     @Override
-    public boolean tienePermiso(String accion) {
-        try {
-            switch (accion) {
-                case "realizar_venta":
-                case "cobrar":
-                case "dar_cambio":
-                case "procesar_devolucion":
-                    return true;
-                default:
-                    return false;
-            }
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public boolean puedeRealizarVenta() {
-        return tienePermiso("realizar_venta");
-    }
-
-    public boolean puedeProcesarDevolucion() {
-        return tienePermiso("procesar_devolucion");
+    public boolean verificarPermisos(String modulo) {
+        return "Ventas".equals(modulo);
     }
 }

@@ -4,9 +4,11 @@ import java.time.LocalDate;
 
 /**
  * CLASE HIJA: Frescos (Unidad III - Herencia)
- * Esta clase hereda de Producto porque los frescos son productos,
- * pero además tienen caducidad y algunos necesitan refri. Yo le puse
- * estos datos extra porque si no no sabríamos cuándo se echan a perder.
+ * Esta clase es la ABSTRACCIÓN perfecta de una Cremería.
+ * La diseñé así porque en una cremería no vendes todo por pieza; a veces el
+ * cliente
+ * solo quiere "diez pesos de queso" o 250 gramos de jamón. Esta clase resuelve
+ * la necesidad de vender productos perecederos de forma fraccionada.
  */
 public class Frescos extends Producto {
     // Estos datos son solo de los frescos (Encapsulamiento)
@@ -46,11 +48,14 @@ public class Frescos extends Producto {
     }
 
     /**
-     * UNIDAD III - POLIMORFISMO:
-     * Aquí hice la conversión de la báscula: divido el precio del kilo entre 1000
-     * y lo multiplico por lo que pesó la rebanada. Así el cobro es exacto.
+     * CONVERSIÓN DE UNIDADES (Abstracción de Cremería):
+     * Aquí es donde sucede la magia de la báscula. El sistema recibe la entrada
+     * en GRAMOS y hace la conversión automática al precio por kilo.
+     * Así el encargado no tiene que andar haciendo reglas de tres en su cabeza.
      */
     public double calcularPrecioPorGramos(double gramos) {
+        // Divido entre 1000 para sacar el precio por gramo y multiplico por los gramos
+        // pedidos
         return (super.getPrecioVenta() / 1000.0) * gramos;
     }
 
@@ -83,14 +88,16 @@ public class Frescos extends Producto {
     }
 
     /**
-     * ESPECIALIZACIÓN (Unidad III):
-     * Aquí hice una lógica para ver si ya casi caduca el producto y ponerlo en
-     * oferta. Yo me fijé que si faltan 3 días ya urge venderlo.
+     * VISIBILIDAD DE RIESGO:
+     * Este método identifica productos con menos de 3 días de vida.
+     * Si regresa true, el Encargado debe crear una promoción inmediatamente
+     * para no perder la mercancía. ¡Es como un semáforo de alerta!
      */
-    public boolean verificarCaducidad() {
+    public boolean alertarCaducidad() {
         if (fechaCaducidad == null) {
             return false;
         }
+        // Si faltan 3 días o menos, ya es riesgo alto
         return LocalDate.now().plusDays(3).isAfter(fechaCaducidad);
     }
 

@@ -23,7 +23,7 @@ public class Venta implements Cloneable {
     private String formaPago; // Si pagó con lana o tarjeta
     private double total;
     private double descuentoAplicado;
-    private List<Producto> listaProductos;
+    private List<DetalleVenta> detalles;
     private Promocion promocionAplicada;
 
     /**
@@ -34,7 +34,7 @@ public class Venta implements Cloneable {
     public Venta() {
         this.folio = contadorFolios++;
         this.fecha = LocalDateTime.now(); // Puse LocalDateTime para que no falle la fecha
-        this.listaProductos = new ArrayList<>();
+        this.detalles = new ArrayList<>();
         this.total = 0.0;
         this.descuentoAplicado = 0.0;
         this.formaPago = "Efectivo"; // Por default
@@ -56,21 +56,45 @@ public class Venta implements Cloneable {
      * ya sea un refresco o un kilo de jamón.
      */
     public void agregarProducto(Producto producto) {
+        agregarProducto(producto, 1);
+    }
+
+    /**
+     * SOBRECARGA DE MÉTODOS (Unidad II):
+     * Agregamos un producto con una cantidad específica.
+     * Si ya existe un producto con el mismo código de barras (y no es por peso),
+     * simplemente aumentamos la cantidad.
+     */
+    public void agregarProducto(Producto producto, int cantidad) {
         try {
             if (producto != null && producto.verificarStock()) {
-                // Aquí checo si es un producto fresco para ver si le bajo el precio.
-                // Este es un ejemplo de cómo uso el polimorfismo (instanceof).
-                if (producto instanceof Frescos) {
-                    Frescos f = (Frescos) producto;
-                    if (f.verificarCaducidad() && promocionAplicada == null) {
-                        System.out.println("Liquidación: Este fresco está por vencer, 20% menos!");
-                        Promocion remate = new Promocion("Remate de Frescos", 20.0, java.time.LocalDate.now(),
-                                java.time.LocalDate.now().plusDays(1));
-                        remate.getListaProductos().add(f);
-                        this.promocionAplicada = remate;
+                // Si el producto ya está y NO se vende por gramos/peso, agrupamos
+                boolean agrupado = false;
+                if (!(producto instanceof Frescos && ((Frescos) producto).isSeVendePorGramos())) {
+                    for (DetalleVenta detalle : detalles) {
+                        if (detalle.getProducto().getCodigoBarras().equals(producto.getCodigoBarras())) {
+                            detalle.setCantidad(detalle.getCantidad() + cantidad);
+                            agrupado = true;
+                            break;
+                        }
                     }
                 }
-                listaProductos.add(producto);
+
+                if (!agrupado) {
+                    // Aquí checo si es un producto fresco para ver si le bajo el precio.
+                    // Este es un ejemplo de cómo uso el polimorfismo (instanceof).
+                    if (producto instanceof Frescos) {
+                        Frescos f = (Frescos) producto;
+                        if (f.alertarCaducidad() && promocionAplicada == null) {
+                            System.out.println("Liquidación: Este fresco está por vencer, 20% menos!");
+                            Promocion remate = new Promocion("Remate de Frescos", 20.0, java.time.LocalDate.now(),
+                                    java.time.LocalDate.now().plusDays(1));
+                            remate.getListaProductos().add(f);
+                            this.promocionAplicada = remate;
+                        }
+                    }
+                    detalles.add(new DetalleVenta(producto, cantidad));
+                }
                 calcularTotal();
             }
         } catch (Exception e) {
@@ -85,18 +109,19 @@ public class Venta implements Cloneable {
     private void calcularTotal() {
         try {
             double subtotal = 0;
-            for (Producto p : listaProductos) {
-                subtotal += p.getPrecioVenta();
+            for (DetalleVenta d : detalles) {
+                subtotal += d.getSubtotal();
             }
 
             // Si hay promo, la aplico aquí
             if (promocionAplicada != null && promocionAplicada.estaActiva()) {
                 double totalConDescuento = 0.0;
-                for (Producto producto : listaProductos) {
+                for (DetalleVenta d : detalles) {
+                    Producto producto = d.getProducto();
                     if (promocionAplicada.aplicaAProducto(producto)) {
-                        totalConDescuento += promocionAplicada.calcularPrecioConDescuento(producto);
+                        totalConDescuento += promocionAplicada.calcularPrecioConDescuento(producto) * d.getCantidad();
                     } else {
-                        totalConDescuento += producto.getPrecioVenta();
+                        totalConDescuento += d.getSubtotal();
                     }
                 }
                 this.descuentoAplicado = subtotal - totalConDescuento;
@@ -127,7 +152,10 @@ public class Venta implements Cloneable {
     public void finalizarVenta() {
         try {
             double totalDescuentoExtra = 0.0;
-            for (Producto producto : listaProductos) {
+            for (DetalleVenta d : detalles) {
+                Producto producto = d.getProducto();
+                int cant = d.getCantidad();
+
                 // Bajo el stock de mi inventario físico
                 if (producto.getStockActual() > 0) {
                     if (producto instanceof Frescos && ((Frescos) producto).isSeVendePorGramos()) {
@@ -135,15 +163,23 @@ public class Venta implements Cloneable {
                         // Aquí va lo de los gramos porque los jamones son un relajo para el inventario.
                         producto.setStockActual((int) (producto.getStockActual() - f.getCantidadGramos()));
                     } else {
-                        producto.setStockActual(producto.getStockActual() - 1);
+                        producto.setStockActual(producto.getStockActual() - cant);
+                    }
+
+                    // VALIDACIÓN DE STOCK MÍNIMO:
+                    // Si después de la venta nos queda poquito, hay que avisar de volada.
+                    if (producto.necesitaReposicion()) {
+                        System.out.println("ALERTAL STOCK CRÍTICO: El producto " + producto.getNombre() + " (Código: "
+                                + producto.getCodigoBarras() + ") se está agotando. Stock actual: "
+                                + producto.getStockActual() + ", Mínimo: " + producto.getStockMinimo());
                     }
                 }
 
                 // Aquí aplico la Unidad III (Polimorfismo) para ver tipos de productos
                 if (producto instanceof Frescos) {
                     Frescos f = (Frescos) producto;
-                    if (f.verificarCaducidad() && promocionAplicada == null) {
-                        double descuento = f.getPrecioVenta() * 0.20;
+                    if (f.alertarCaducidad() && promocionAplicada == null) {
+                        double descuento = d.getSubtotal() * 0.20;
                         totalDescuentoExtra += descuento;
                     }
                 }
@@ -159,7 +195,10 @@ public class Venta implements Cloneable {
     public Venta clone() {
         try {
             Venta clon = (Venta) super.clone();
-            clon.listaProductos = new ArrayList<>(this.listaProductos);
+            clon.detalles = new ArrayList<>();
+            for (DetalleVenta d : this.detalles) {
+                clon.detalles.add(d.clone());
+            }
             return clon;
         } catch (CloneNotSupportedException e) {
             return null;
@@ -199,13 +238,21 @@ public class Venta implements Cloneable {
         this.total = total;
     }
 
-    public List<Producto> getListaProductos() {
-        return listaProductos;
+    public List<DetalleVenta> getDetalles() {
+        return detalles;
     }
 
-    public void setListaProductos(List<Producto> listaProductos) {
-        this.listaProductos = listaProductos;
+    public void setDetalles(List<DetalleVenta> detalles) {
+        this.detalles = detalles;
         calcularTotal();
+    }
+
+    public List<Producto> getListaProductos() {
+        List<Producto> productos = new ArrayList<>();
+        for (DetalleVenta d : detalles) {
+            productos.add(d.getProducto());
+        }
+        return productos;
     }
 
     public double getDescuentoAplicado() {

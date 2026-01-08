@@ -93,40 +93,44 @@ public class VistaPedidos extends JPanel {
 
         panel.add(Box.createHorizontalStrut(20));
 
-        btnAgregarProducto = new JButton("Agregar Producto");
-        btnAgregarProducto.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        btnAgregarProducto = new JButton("AGREGAR AL PEDIDO");
+        btnAgregarProducto.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnAgregarProducto.setBackground(new Color(0, 150, 0));
         btnAgregarProducto.setForeground(Color.WHITE);
+        btnAgregarProducto.setPreferredSize(new Dimension(200, 45)); // Más grande
         btnAgregarProducto.setFocusPainted(false);
         btnAgregarProducto.setBorderPainted(false);
         btnAgregarProducto.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnAgregarProducto.addActionListener(e -> agregarProductoAlPedido());
         panel.add(btnAgregarProducto);
 
-        btnGuardarPedido = new JButton("Guardar Pedido");
-        btnGuardarPedido.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        btnGuardarPedido = new JButton("GUARDAR PEDIDO");
+        btnGuardarPedido.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnGuardarPedido.setBackground(new Color(0, 120, 215));
         btnGuardarPedido.setForeground(Color.WHITE);
+        btnGuardarPedido.setPreferredSize(new Dimension(180, 45));
         btnGuardarPedido.setFocusPainted(false);
         btnGuardarPedido.setBorderPainted(false);
         btnGuardarPedido.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnGuardarPedido.addActionListener(e -> guardarPedido());
         panel.add(btnGuardarPedido);
 
-        btnMarcarEntregado = new JButton("Marcar como Entregado");
-        btnMarcarEntregado.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        btnMarcarEntregado = new JButton("RECIBIR PEDIDO");
+        btnMarcarEntregado.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnMarcarEntregado.setBackground(new Color(200, 150, 0));
         btnMarcarEntregado.setForeground(Color.WHITE);
+        btnMarcarEntregado.setPreferredSize(new Dimension(180, 45));
         btnMarcarEntregado.setFocusPainted(false);
         btnMarcarEntregado.setBorderPainted(false);
         btnMarcarEntregado.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnMarcarEntregado.addActionListener(e -> marcarComoEntregado());
         panel.add(btnMarcarEntregado);
 
-        btnCancelarPedido = new JButton("Cancelar Pedido");
-        btnCancelarPedido.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        btnCancelarPedido = new JButton("CANCELAR");
+        btnCancelarPedido.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnCancelarPedido.setBackground(new Color(200, 0, 0));
         btnCancelarPedido.setForeground(Color.WHITE);
+        btnCancelarPedido.setPreferredSize(new Dimension(150, 45));
         btnCancelarPedido.setFocusPainted(false);
         btnCancelarPedido.setBorderPainted(false);
         btnCancelarPedido.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -155,14 +159,14 @@ public class VistaPedidos extends JPanel {
         };
 
         tablaProductos = new JTable(modeloProductos);
-        tablaProductos.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        tablaProductos.setRowHeight(30);
+        tablaProductos.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        tablaProductos.setRowHeight(40);
         tablaProductos.setBackground(new Color(55, 55, 55));
         tablaProductos.setForeground(Color.WHITE);
         tablaProductos.setGridColor(new Color(70, 70, 70));
         tablaProductos.getTableHeader().setBackground(new Color(35, 35, 35));
         tablaProductos.getTableHeader().setForeground(Color.WHITE);
-        tablaProductos.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        tablaProductos.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 16));
 
         JScrollPane scrollPane = new JScrollPane(tablaProductos);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(70, 70, 70)));
@@ -191,14 +195,14 @@ public class VistaPedidos extends JPanel {
         };
 
         tablaPedido = new JTable(modeloPedido);
-        tablaPedido.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        tablaPedido.setRowHeight(30);
+        tablaPedido.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        tablaPedido.setRowHeight(40);
         tablaPedido.setBackground(new Color(55, 55, 55));
         tablaPedido.setForeground(Color.WHITE);
         tablaPedido.setGridColor(new Color(70, 70, 70));
         tablaPedido.getTableHeader().setBackground(new Color(35, 35, 35));
         tablaPedido.getTableHeader().setForeground(Color.WHITE);
-        tablaPedido.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        tablaPedido.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 16));
 
         tablaPedido.getColumn("Eliminar").setCellRenderer(new ButtonRenderer());
         tablaPedido.getColumn("Eliminar").setCellEditor(new ButtonEditorEliminar(new JCheckBox()));

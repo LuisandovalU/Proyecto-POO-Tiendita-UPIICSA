@@ -31,9 +31,9 @@ public class VistaVentas extends JPanel {
     private DefaultTableModel modeloCarrito;
 
     private JLabel lblTotal;
-    private JComboBox<String> comboFormaPago;
     private JButton btnFinalizarVenta;
     private JButton btnCancelarVenta;
+    private JTextField txtEscaneo; // El escáner de códigos de barras
 
     private String categoriaActual = "Todos";
     private DecimalFormat df = new DecimalFormat("#,##0.00");
@@ -72,7 +72,7 @@ public class VistaVentas extends JPanel {
         panel.setPreferredSize(new Dimension(200, 0));
 
         JLabel titulo = new JLabel("Categorías");
-        titulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 22)); // ¡Más grande!
         titulo.setForeground(Color.WHITE);
         titulo.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(titulo);
@@ -93,7 +93,7 @@ public class VistaVentas extends JPanel {
 
     private JButton crearBotonCategoria(String categoria) {
         JButton btn = new JButton(categoria);
-        btn.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 16)); // Negrita y más grande
         btn.setBackground(new Color(60, 60, 60));
         btn.setForeground(Color.WHITE);
         btn.setFocusPainted(false);
@@ -137,9 +137,38 @@ public class VistaVentas extends JPanel {
         panel.setBackground(new Color(45, 45, 45));
 
         JLabel titulo = new JLabel("Productos Disponibles");
-        titulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 24)); // ¡Visible!
         titulo.setForeground(Color.WHITE);
-        panel.add(titulo, BorderLayout.NORTH);
+
+        // --- UNIDAD IV: UX / ESCÁNER DE CÓDIGOS ---
+        JPanel panelBusqueda = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        panelBusqueda.setOpaque(false);
+        txtEscaneo = new JTextField(15);
+        txtEscaneo.setFont(new Font("Segoe UI", Font.PLAIN, 18)); // Texto de entrada más grande
+        txtEscaneo.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(new Color(150, 150, 150)), "Escanear Código",
+                0, 0, new Font("Segoe UI", Font.BOLD, 12), Color.LIGHT_GRAY));
+        txtEscaneo.setBackground(new Color(60, 60, 60));
+        txtEscaneo.setForeground(Color.WHITE);
+        txtEscaneo.setCaretColor(Color.WHITE);
+
+        // Al dar enter, se agrega de volada
+        txtEscaneo.addActionListener(e -> {
+            String codigo = txtEscaneo.getText().trim();
+            if (!codigo.isEmpty()) {
+                agregarProductoPorCodigo(codigo);
+                txtEscaneo.setText(""); // Limpiar para el que sigue
+            }
+        });
+
+        panelBusqueda.add(txtEscaneo);
+
+        JPanel panelTitulo = new JPanel(new BorderLayout());
+        panelTitulo.setOpaque(false);
+        panelTitulo.add(titulo, BorderLayout.WEST);
+        panelTitulo.add(panelBusqueda, BorderLayout.EAST);
+
+        panel.add(panelTitulo, BorderLayout.NORTH);
 
         String[] columnas = { "Código", "Nombre", "Marca", "Precio", "Stock", "Agregar" };
         modeloProductos = new DefaultTableModel(columnas, 0) {
@@ -150,14 +179,14 @@ public class VistaVentas extends JPanel {
         };
 
         tablaProductos = new JTable(modeloProductos);
-        tablaProductos.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        tablaProductos.setRowHeight(30);
+        tablaProductos.setFont(new Font("Segoe UI", Font.PLAIN, 16)); // Filas de tabla visibles
+        tablaProductos.setRowHeight(40); // Espacio para el dedo/ojo
         tablaProductos.setBackground(new Color(55, 55, 55));
         tablaProductos.setForeground(Color.WHITE);
         tablaProductos.setGridColor(new Color(70, 70, 70));
         tablaProductos.getTableHeader().setBackground(new Color(35, 35, 35));
         tablaProductos.getTableHeader().setForeground(Color.WHITE);
-        tablaProductos.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        tablaProductos.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 16));
 
         tablaProductos.getColumn("Agregar").setCellRenderer(new ButtonRenderer());
         tablaProductos.getColumn("Agregar").setCellEditor(new ButtonEditor(new JCheckBox()));
@@ -177,7 +206,7 @@ public class VistaVentas extends JPanel {
         panel.setPreferredSize(new Dimension(400, 0));
 
         JLabel titulo = new JLabel("Carrito de Compra");
-        titulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 22));
         titulo.setForeground(Color.WHITE);
         panel.add(titulo, BorderLayout.NORTH);
 
@@ -190,14 +219,14 @@ public class VistaVentas extends JPanel {
         };
 
         tablaCarrito = new JTable(modeloCarrito);
-        tablaCarrito.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        tablaCarrito.setRowHeight(30);
+        tablaCarrito.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        tablaCarrito.setRowHeight(40);
         tablaCarrito.setBackground(new Color(55, 55, 55));
         tablaCarrito.setForeground(Color.WHITE);
         tablaCarrito.setGridColor(new Color(70, 70, 70));
         tablaCarrito.getTableHeader().setBackground(new Color(35, 35, 35));
         tablaCarrito.getTableHeader().setForeground(Color.WHITE);
-        tablaCarrito.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        tablaCarrito.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 16));
 
         tablaCarrito.getColumn("Eliminar").setCellRenderer(new ButtonRenderer());
         tablaCarrito.getColumn("Eliminar").setCellEditor(new ButtonEditorCarrito(new JCheckBox()));
@@ -214,47 +243,33 @@ public class VistaVentas extends JPanel {
         panelPago.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
 
         lblTotal = new JLabel("Total: $0.00");
-        lblTotal.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        lblTotal.setFont(new Font("Segoe UI", Font.BOLD, 36)); // ¡Que se vea el dinero!
         lblTotal.setForeground(new Color(0, 200, 100));
         lblTotal.setAlignmentX(Component.CENTER_ALIGNMENT);
         panelPago.add(lblTotal);
-        panelPago.add(Box.createVerticalStrut(10));
-
-        JLabel lblFormaPago = new JLabel("Forma de Pago:");
-        lblFormaPago.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        lblFormaPago.setForeground(Color.WHITE);
-        lblFormaPago.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panelPago.add(lblFormaPago);
-        panelPago.add(Box.createVerticalStrut(5));
-
-        comboFormaPago = new JComboBox<>(new String[] { "Efectivo", "Tarjeta", "Transferencia" });
-        comboFormaPago.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        comboFormaPago.setMaximumSize(new Dimension(200, 35));
-        comboFormaPago.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panelPago.add(comboFormaPago);
         panelPago.add(Box.createVerticalStrut(15));
 
-        btnFinalizarVenta = new JButton("Finalizar Venta");
-        btnFinalizarVenta.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnFinalizarVenta = new JButton("FINALIZAR");
+        btnFinalizarVenta.setFont(new Font("Segoe UI", Font.BOLD, 20)); // Botón imponente
         btnFinalizarVenta.setBackground(new Color(0, 150, 0));
         btnFinalizarVenta.setForeground(Color.WHITE);
         btnFinalizarVenta.setFocusPainted(false);
         btnFinalizarVenta.setBorderPainted(false);
         btnFinalizarVenta.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnFinalizarVenta.setMaximumSize(new Dimension(200, 40));
+        btnFinalizarVenta.setMaximumSize(new Dimension(300, 60)); // Más grande
         btnFinalizarVenta.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnFinalizarVenta.addActionListener(e -> finalizarVenta());
         panelPago.add(btnFinalizarVenta);
         panelPago.add(Box.createVerticalStrut(10));
 
-        btnCancelarVenta = new JButton("Cancelar Venta");
-        btnCancelarVenta.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        btnCancelarVenta = new JButton("CANCELAR");
+        btnCancelarVenta.setFont(new Font("Segoe UI", Font.BOLD, 18));
         btnCancelarVenta.setBackground(new Color(200, 0, 0));
         btnCancelarVenta.setForeground(Color.WHITE);
         btnCancelarVenta.setFocusPainted(false);
         btnCancelarVenta.setBorderPainted(false);
         btnCancelarVenta.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnCancelarVenta.setMaximumSize(new Dimension(200, 40));
+        btnCancelarVenta.setMaximumSize(new Dimension(300, 50));
         btnCancelarVenta.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnCancelarVenta.addActionListener(e -> cancelarVenta());
         panelPago.add(btnCancelarVenta);
@@ -281,7 +296,7 @@ public class VistaVentas extends JPanel {
 
             for (Producto producto : productos) {
                 String nombreMostrado = producto.getNombre();
-                if (producto instanceof Frescos && ((Frescos) producto).verificarCaducidad()) {
+                if (producto instanceof Frescos && ((Frescos) producto).alertarCaducidad()) {
                     nombreMostrado = "<html><font color='red'>[PRÓXIMO A CADUCAR] " + producto.getNombre()
                             + "</font></html>";
                 }
@@ -300,6 +315,26 @@ public class VistaVentas extends JPanel {
             JOptionPane.showMessageDialog(this,
                     "Error al cargar productos: " + e.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * UNIDAD V: Abstracción de procesos.
+     * Este método simula el escaneo de un producto por su código.
+     */
+    private void agregarProductoPorCodigo(String codigo) {
+        Producto p = productoController.buscarProducto(codigo);
+        if (p != null) {
+            if (ventaController.agregarProductoAVenta(p, 1)) {
+                actualizarCarrito();
+                actualizarTablaProductos();
+            } else {
+                JOptionPane.showMessageDialog(this, "No hay stock de: " + p.getNombre(), "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Código no registrado: " + codigo, "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -420,7 +455,7 @@ public class VistaVentas extends JPanel {
                                 + "</html>";
                         precioMostrado = "<html><strike>$" + df.format(producto.getPrecioVenta())
                                 + "</strike> <font color='green'>$" + df.format(precioConDesc) + "</font></html>";
-                    } else if (producto instanceof Frescos && ((Frescos) producto).verificarCaducidad()) {
+                    } else if (producto instanceof Frescos && ((Frescos) producto).alertarCaducidad()) {
                         // Caso de liquidación automática por caducidad
                         double precioLiquidacion = producto.getPrecioVenta() * 0.8;
                         nombreMostrado = "<html><font color='red'>[REMATE DE FRESCOS]</font> " + nombreMostrado
@@ -477,10 +512,22 @@ public class VistaVentas extends JPanel {
                 return;
             }
 
-            String formaPago = (String) comboFormaPago.getSelectedItem();
+            String[] opciones = { "Efectivo", "Tarjeta" };
+            int seleccion = JOptionPane.showOptionDialog(this,
+                    "Total a pagar: " + lblTotal.getText() + "\n¿Cuál es la forma de pago?",
+                    "Finalizar Venta",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null, opciones, opciones[0]);
+
+            if (seleccion == JOptionPane.CLOSED_OPTION) {
+                return; // No hacer nada si cierran el diálogo
+            }
+
+            String formaPago = opciones[seleccion];
             if (ventaController.finalizarVenta(formaPago)) {
                 System.out.println("DEBUG: Venta finalizada correctamente en controlador.");
-                JOptionPane.showMessageDialog(this, "Venta Exitosa");
+                JOptionPane.showMessageDialog(this, "Venta Exitosa (" + formaPago + ")");
                 actualizarCarrito();
                 actualizarTablaProductos();
             } else {

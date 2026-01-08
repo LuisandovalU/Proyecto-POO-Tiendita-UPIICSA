@@ -16,34 +16,13 @@ public class Administrador extends Usuario {
     }
 
     /**
-     * El administrador tiene acceso completo al sistema
+     * El administrador tiene acceso total al sistema (incluyendo Pedidos y
+     * Promociones)
      * Aplicación de polimorfismo: implementa el método abstracto de Usuario
      */
     @Override
-    public boolean tienePermiso(String accion) {
-        try {
-            // El administrador tiene todos los permisos
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    /**
-     * Permisos específicos del administrador según requerimientos:
-     * - Ver desglose completo de ventas por producto y departamento
-     * - Generar listas de pedidos cuando el stock llega al mínimo
-     * - Ver totales de ventas de tiempo aire por plataforma
-     */
-    public boolean puedeVerReportes() {
-        return true;
-    }
-
-    public boolean puedeGenerarPedidos() {
-        return true;
-    }
-
-    public boolean puedeVerVentasTiempoAire() {
+    public boolean verificarPermisos(String modulo) {
+        // El administrador tiene todos los permisos en todos los módulos
         return true;
     }
 }

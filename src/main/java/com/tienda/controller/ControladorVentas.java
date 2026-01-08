@@ -1,6 +1,7 @@
 package com.tienda.controller;
 
 import com.tienda.model.Producto;
+import com.tienda.model.DetalleVenta;
 import com.tienda.model.Promocion;
 import com.tienda.model.Venta;
 import javax.swing.table.DefaultTableModel;
@@ -144,6 +145,7 @@ public class ControladorVentas {
                         venta.getFolio(),
                         venta.getFecha().format(dtf),
                         "$" + df.format(venta.getTotal()),
+                        venta.getFormaPago(),
                         promoNombre
                 };
                 modeloHistorial.addRow(fila);
@@ -151,6 +153,20 @@ public class ControladorVentas {
         } catch (Exception e) {
             System.err.println("Error al llenar la tabla: " + e.getMessage());
         }
+    }
+
+    /**
+     * UNIDAD V: Reportes de Ingresos.
+     * Calcula cuánto hemos ganado por cada método de pago.
+     */
+    public double obtenerTotalPorFormaPago(String formaPago) {
+        double total = 0;
+        for (Venta v : historialGlobal) {
+            if (v.getFormaPago().equalsIgnoreCase(formaPago)) {
+                total += v.getTotal();
+            }
+        }
+        return total;
     }
 
     public void cancelarVenta() {
@@ -169,10 +185,42 @@ public class ControladorVentas {
             if (ventaActual == null) {
                 return false;
             }
-            List<Producto> productos = ventaActual.getListaProductos();
-            if (productos.remove(producto)) {
-                ventaActual.setListaProductos(productos);
-                return true;
+            List<DetalleVenta> detalles = ventaActual.getDetalles();
+            for (int i = 0; i < detalles.size(); i++) {
+                if (detalles.get(i).getProducto().getCodigoBarras().equals(producto.getCodigoBarras())) {
+                    detalles.remove(i);
+                    ventaActual.setDetalles(detalles); // Esto recalcula el total
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * UNIDAD IV: UX - Ajuste manual de cantidad.
+     * Permite cambiar la cantidad de un producto que yaestá en el carrito.
+     */
+    public boolean actualizarCantidad(Producto producto, int nuevaCantidad) {
+        try {
+            if (ventaActual == null || producto == null || nuevaCantidad <= 0) {
+                return false;
+            }
+
+            // Checar stock
+            if (producto.getStockActual() < nuevaCantidad) {
+                return false;
+            }
+
+            List<DetalleVenta> detalles = ventaActual.getDetalles();
+            for (DetalleVenta d : detalles) {
+                if (d.getProducto().getCodigoBarras().equals(producto.getCodigoBarras())) {
+                    d.setCantidad(nuevaCantidad);
+                    ventaActual.setDetalles(detalles); // Recalcular total
+                    return true;
+                }
             }
             return false;
         } catch (Exception e) {

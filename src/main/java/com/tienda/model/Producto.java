@@ -159,6 +159,9 @@ public abstract class Producto {
     }
 
     public void setStockMinimo(int stockMinimo) {
+        // // Aquí el sistema avisa solo cuando ya estamos en el límite, para que el
+        // Administrador sepa qué pedirle al proveedor antes de que se acabe por
+        // completo
         this.stockMinimo = stockMinimo;
     }
 

@@ -1,6 +1,6 @@
 package com.tienda.main;
 
-import com.tienda.view.MainWindow;
+import com.tienda.view.LoginWindow;
 import javax.swing.SwingUtilities;
 
 /**
@@ -15,8 +15,10 @@ public class Main {
             // Ejecutar en el hilo de eventos de Swing
             SwingUtilities.invokeLater(() -> {
                 try {
-                    MainWindow mainWindow = new MainWindow();
-                    mainWindow.setVisible(true);
+                    // UNIDAD V: SEGURIDAD (RBAC)
+                    // Ahora forzamos el login antes de cualquier otra cosa.
+                    LoginWindow loginWindow = new LoginWindow();
+                    loginWindow.setVisible(true);
                 } catch (Exception e) {
                     System.err.println("Error al iniciar la aplicación: " + e.getMessage());
                     e.printStackTrace();

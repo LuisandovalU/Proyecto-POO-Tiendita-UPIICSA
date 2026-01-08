@@ -27,10 +27,10 @@ public class UsuarioController {
         try {
             // Administrador
             usuarios.add(new Administrador("admin", "admin123", "Administrador Principal"));
-            
+
             // Vendedor
             usuarios.add(new Vendedor("vendedor1", "vendedor123", "Juan Pérez"));
-            
+
             // Encargado
             usuarios.add(new Encargado("encargado1", "encargado123", "María González"));
         } catch (Exception e) {
@@ -40,8 +40,9 @@ public class UsuarioController {
 
     /**
      * Autentica un usuario
+     * 
      * @param nombreUsuario Nombre de usuario
-     * @param contrasena Contraseña
+     * @param contrasena    Contraseña
      * @return true si las credenciales son correctas, false en caso contrario
      */
     public boolean autenticar(String nombreUsuario, String contrasena) {
@@ -49,12 +50,12 @@ public class UsuarioController {
             if (nombreUsuario == null || contrasena == null) {
                 return false;
             }
-            
+
             Usuario usuario = usuarios.stream()
                     .filter(u -> u.verificarCredenciales(nombreUsuario, contrasena))
                     .findFirst()
                     .orElse(null);
-            
+
             if (usuario != null) {
                 this.usuarioActual = usuario;
                 return true;
@@ -85,14 +86,14 @@ public class UsuarioController {
     }
 
     /**
-     * Verifica si el usuario actual tiene un permiso específico
+     * Verifica si el usuario actual tiene permiso para acceder a un módulo
      */
-    public boolean tienePermiso(String accion) {
+    public boolean verificarPermisos(String modulo) {
         try {
             if (usuarioActual == null) {
                 return false;
             }
-            return usuarioActual.tienePermiso(accion);
+            return usuarioActual.verificarPermisos(modulo);
         } catch (Exception e) {
             System.err.println("Error al verificar permiso: " + e.getMessage());
             return false;

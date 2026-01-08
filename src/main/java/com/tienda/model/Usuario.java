@@ -33,10 +33,10 @@ public abstract class Usuario {
 
     /**
      * MÉTODO ABSTRACTO (Unidad III):
-     * Este lo hice para ver si el usuario puede o no hacer algo.
-     * Es puro polimorfismo porque un Admin puede todo y un Vendedor no.
+     * Este lo hice para ver si el usuario puede entrar a un módulo específico.
+     * Es puro polimorfismo para que cada rol tenga su propio control de acceso.
      */
-    public abstract boolean tienePermiso(String accion);
+    public abstract boolean verificarPermisos(String modulo);
 
     /**
      * Verifica que la contraseña sea la correcta.

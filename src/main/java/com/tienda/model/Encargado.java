@@ -17,44 +17,20 @@ public class Encargado extends Usuario {
     }
 
     /**
-     * Permisos del encargado según requerimientos:
-     * - Todas las funciones de vendedor
-     * - Verificar que las entregas coincidan con los pedidos
-     * - Realizar pagos en efectivo
-     * - Para pagos interbancarios, debe comunicarse con el administrador
+     * El Encargado puede entrar a Ventas e Inventarios.
      * Aplicación de polimorfismo: implementa el método abstracto de Usuario
      */
     @Override
-    public boolean tienePermiso(String accion) {
-        try {
-            switch (accion) {
-                case "realizar_venta":
-                case "cobrar":
-                case "dar_cambio":
-                case "procesar_devolucion":
-                case "verificar_entrega":
-                case "pagar_efectivo":
-                    return true;
-                case "pagar_interbancario":
-                    // Debe comunicarse con administrador
-                    return false;
-                default:
-                    return false;
-            }
-        } catch (Exception e) {
+    public boolean verificarPermisos(String modulo) {
+        if (modulo == null)
             return false;
+
+        switch (modulo) {
+            case "Ventas":
+            case "Inventarios":
+                return true;
+            default:
+                return false;
         }
-    }
-
-    public boolean puedeVerificarEntrega() {
-        return tienePermiso("verificar_entrega");
-    }
-
-    public boolean puedePagarEfectivo() {
-        return tienePermiso("pagar_efectivo");
-    }
-
-    public boolean puedeRealizarVenta() {
-        return tienePermiso("realizar_venta");
     }
 }

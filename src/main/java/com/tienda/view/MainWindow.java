@@ -6,8 +6,6 @@ import com.tienda.controller.ProveedorController;
 import com.tienda.controller.UsuarioController;
 import com.tienda.controller.ControladorVentas;
 import com.tienda.controller.PromocionController;
-import com.tienda.model.Vendedor;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -39,45 +37,15 @@ public class MainWindow extends JFrame {
     private VistaProveedores vistaProveedores;
     private VistaPedidos vistaPedidos;
     private VistaHistorial vistaHistorial;
-    private VistaGestionPromociones vistaPromociones; // Manteniendo el tipo original, solo cambiando el comentario si
-                                                      // aplica.
+    private VistaGestionPromociones vistaPromociones;
 
     /**
-     * Constructor por defecto - Inicia con perfil de Vendedor por si se nos olvida
-     * loguear.
-     */
-    public MainWindow() {
-        try {
-            // Le puse este diseño (Laf) para que se vea de "Senior" aunque sea de 3er
-            // semestre.
-            UIManager.setLookAndFeel(new com.formdev.flatlaf.FlatDarkLaf());
-            SwingUtilities.updateComponentTreeUI(this);
-        } catch (Exception e) {
-            System.err.println("Error al configurar FlatLaf: " + e.getMessage());
-        }
-
-        // Crear usuario vendedor por defecto. Me aseguré de que no esté vacío.
-        Vendedor vendedorDefault = new Vendedor("vendedor", "vendedor", "Vendedor");
-        this.usuarioController = new UsuarioController();
-        usuarioController.establecerUsuarioPorDefecto(vendedorDefault);
-
-        // Inicializar controladores (mis cerebros del programa)
-        this.productoController = new ProductoController();
-        this.promocionController = new PromocionController();
-        this.ventaController = new ControladorVentas(promocionController);
-        this.proveedorController = new ProveedorController();
-        this.pedidoProveedorController = new PedidoProveedorController(productoController);
-
-        inicializarComponentes();
-        configurarVentana();
-    }
-
-    /**
-     * Constructor con UsuarioController - Este lo uso cuando ya sabemos qué usuario
-     * entró.
+     * Constructor con UsuarioController - Forzamos que pasen el controlador
+     * de usuario para que no entren si no están logueados.
      */
     public MainWindow(UsuarioController usuarioController) {
         try {
+            // Diseño moderno y oscuro (FlatLaf)
             UIManager.setLookAndFeel(new com.formdev.flatlaf.FlatDarkLaf());
             SwingUtilities.updateComponentTreeUI(this);
         } catch (Exception e) {
@@ -86,7 +54,7 @@ public class MainWindow extends JFrame {
 
         this.usuarioController = usuarioController;
 
-        // Inicializar controladores de nuevo.
+        // Inicializar controladores (cerebros del programa)
         this.productoController = new ProductoController();
         this.promocionController = new PromocionController();
         this.ventaController = new ControladorVentas(promocionController);
@@ -101,35 +69,50 @@ public class MainWindow extends JFrame {
         setLayout(new BorderLayout());
         setBackground(new Color(45, 45, 45));
 
-        // Pestañas solicitadas en la Unidad IV.
+        // Pestañas dinámicas según el rol (Unidad IV - GUI)
         tabbedPane = new JTabbedPane();
         tabbedPane.setBackground(new Color(35, 35, 35));
         tabbedPane.setForeground(Color.WHITE);
-        tabbedPane.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        tabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 18)); // ¡Mucha más visibilidad!
 
-        // Pestaña 1: Ventas (La más importante!)
+        // Verificamos permisos para cada módulo y agregamos solo lo permitido
+        // Esto cumple con el requerimiento de "vista simplificada"
+        // Se eliminaron funciones no solicitadas para priorizar la usabilidad de los
+        // perfiles requeridos por la tienda
+
+        // Pestaña: Ventas (La más importante!)
         vistaVentas = new VistaVentas(productoController, ventaController);
         tabbedPane.addTab("Ventas", vistaVentas);
 
-        // Pestaña 2: Inventario (Para ver qué queda)
-        vistaInventario = new VistaInventario(productoController);
-        tabbedPane.addTab("Inventario", vistaInventario);
+        // Pestaña: Inventario (Encargado, Admin)
+        if (usuarioController.verificarPermisos("Inventarios")) {
+            vistaInventario = new VistaInventario(productoController);
+            tabbedPane.addTab("Inventario", vistaInventario);
+        }
 
-        // Pestaña 3: Proveedores (A quién le compramos)
-        vistaProveedores = new VistaProveedores(proveedorController);
-        tabbedPane.addTab("Proveedores", vistaProveedores);
+        // Pestaña: Proveedores (Admin)
+        if (usuarioController.verificarPermisos("Proveedores")) {
+            vistaProveedores = new VistaProveedores(proveedorController);
+            tabbedPane.addTab("Proveedores", vistaProveedores);
+        }
 
-        // Pestaña 4: Pedidos (Lo que viene en camino)
-        vistaPedidos = new VistaPedidos(pedidoProveedorController, proveedorController, productoController);
-        tabbedPane.addTab("Pedidos", vistaPedidos);
+        // Pestaña: Pedidos (Admin)
+        if (usuarioController.verificarPermisos("Pedidos")) {
+            vistaPedidos = new VistaPedidos(pedidoProveedorController, proveedorController, productoController);
+            tabbedPane.addTab("Pedidos", vistaPedidos);
+        }
 
-        // Pestaña 5: Historial (Para que el Admin audite las ventas)
-        vistaHistorial = new VistaHistorial(ventaController);
-        tabbedPane.addTab("Historial", vistaHistorial);
+        // Pestaña: Historial (Admin)
+        if (usuarioController.verificarPermisos("Historial")) {
+            vistaHistorial = new VistaHistorial(ventaController);
+            tabbedPane.addTab("Historial", vistaHistorial);
+        }
 
-        // Pestaña 6: Promociones (Solo para el Administrador)
-        vistaPromociones = new VistaGestionPromociones(productoController, promocionController, usuarioController);
-        tabbedPane.addTab("Promociones", vistaPromociones);
+        // Pestaña: Promociones (Admin)
+        if (usuarioController.verificarPermisos("Promociones")) {
+            vistaPromociones = new VistaGestionPromociones(productoController, promocionController, usuarioController);
+            tabbedPane.addTab("Promociones", vistaPromociones);
+        }
 
         add(tabbedPane, BorderLayout.CENTER);
 
@@ -139,16 +122,16 @@ public class MainWindow extends JFrame {
         panelInferior.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
         JLabel info = new JLabel("Sistema de Punto de Venta - Tienda de la Esquina");
-        info.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        info.setForeground(new Color(150, 150, 150));
+        info.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        info.setForeground(new Color(180, 180, 180));
         panelInferior.add(info);
 
         if (usuarioController != null && usuarioController.getUsuarioActual() != null) {
             JLabel lblUsuario = new JLabel(" | Usuario: " +
                     usuarioController.getUsuarioActual().getNombreCompleto() +
                     " (" + usuarioController.getUsuarioActual().getTipoUsuario() + ")");
-            lblUsuario.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-            lblUsuario.setForeground(new Color(200, 200, 200));
+            lblUsuario.setFont(new Font("Segoe UI", Font.BOLD, 14));
+            lblUsuario.setForeground(new Color(220, 220, 220));
             panelInferior.add(lblUsuario);
         }
 

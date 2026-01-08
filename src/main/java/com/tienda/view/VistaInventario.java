@@ -19,6 +19,8 @@ public class VistaInventario extends JPanel {
     private ProductoController productoController;
     private JTable tablaProductos;
     private DefaultTableModel modeloProductos;
+    private JTable tablaAlertas;
+    private DefaultTableModel modeloAlertas;
     private DecimalFormat df = new DecimalFormat("#,##0.00");
 
     public VistaInventario(ProductoController productoController) {
@@ -45,41 +47,48 @@ public class VistaInventario extends JPanel {
         panelSuperior.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
         JLabel titulo = new JLabel("Inventario de Productos");
-        titulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 24)); // ¡Más grande!
         titulo.setForeground(Color.WHITE);
         panelSuperior.add(titulo);
 
         panelSuperior.add(Box.createHorizontalStrut(20));
 
         // Botón para meter nuevos productos al sistema.
-        JButton btnAgregar = new JButton("Agregar Producto");
-        btnAgregar.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        JButton btnAgregar = new JButton("AGREGAR");
+        btnAgregar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnAgregar.setBackground(new Color(0, 150, 0));
         btnAgregar.setForeground(Color.WHITE);
+        btnAgregar.setPreferredSize(new Dimension(150, 45));
+        btnAgregar.setFocusPainted(false);
+        btnAgregar.setBorderPainted(false);
+        btnAgregar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnAgregar.addActionListener(e -> mostrarDialogoProducto(null));
         panelSuperior.add(btnAgregar);
 
         // Botón por si nos equivocamos en el precio o el nombre.
-        JButton btnEditar = new JButton("Editar Producto");
-        btnEditar.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        JButton btnEditar = new JButton("EDITAR");
+        btnEditar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnEditar.setBackground(new Color(200, 150, 0));
         btnEditar.setForeground(Color.WHITE);
+        btnEditar.setPreferredSize(new Dimension(150, 45));
         btnEditar.addActionListener(e -> editarProductoSeleccionado());
         panelSuperior.add(btnEditar);
 
         // Botón para quitar productos que ya no vendemos.
-        JButton btnEliminar = new JButton("Eliminar Producto");
-        btnEliminar.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        JButton btnEliminar = new JButton("ELIMINAR");
+        btnEliminar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnEliminar.setBackground(new Color(200, 0, 0));
         btnEliminar.setForeground(Color.WHITE);
+        btnEliminar.setPreferredSize(new Dimension(150, 45));
         btnEliminar.addActionListener(e -> eliminarProductoSeleccionado());
         panelSuperior.add(btnEliminar);
 
         // Botón para refrescar la tabla si algo cambió.
-        JButton btnActualizar = new JButton("Actualizar");
-        btnActualizar.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        JButton btnActualizar = new JButton("ACTUALIZAR");
+        btnActualizar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnActualizar.setBackground(new Color(0, 120, 215));
         btnActualizar.setForeground(Color.WHITE);
+        btnActualizar.setPreferredSize(new Dimension(150, 45));
         btnActualizar.setFocusPainted(false);
         btnActualizar.setBorderPainted(false);
         btnActualizar.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -99,20 +108,61 @@ public class VistaInventario extends JPanel {
         };
 
         tablaProductos = new JTable(modeloProductos);
-        tablaProductos.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        tablaProductos.setRowHeight(30);
+        tablaProductos.setFont(new Font("Segoe UI", Font.PLAIN, 16)); // Tabla legible
+        tablaProductos.setRowHeight(40);
         tablaProductos.setBackground(new Color(55, 55, 55));
         tablaProductos.setForeground(Color.WHITE);
         tablaProductos.setGridColor(new Color(70, 70, 70));
         tablaProductos.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tablaProductos.getTableHeader().setBackground(new Color(35, 35, 35));
         tablaProductos.getTableHeader().setForeground(Color.WHITE);
-        tablaProductos.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        tablaProductos.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 16));
 
         JScrollPane scrollPane = new JScrollPane(tablaProductos);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(70, 70, 70)));
         scrollPane.getViewport().setBackground(new Color(55, 55, 55));
         add(scrollPane, BorderLayout.CENTER);
+
+        // Panel de Alertas de Stock Crítico (Integrado aquí en vez de Dashboard)
+        JPanel panelAlertas = crearPanelAlertas();
+        add(panelAlertas, BorderLayout.SOUTH);
+    }
+
+    private JPanel crearPanelAlertas() {
+        JPanel panel = new JPanel(new BorderLayout(5, 5));
+        panel.setBackground(new Color(45, 30, 30)); // Fondo rojizo para alertar
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(2, 0, 0, 0, new Color(200, 50, 50)),
+                BorderFactory.createEmptyBorder(10, 20, 10, 20)));
+        panel.setPreferredSize(new Dimension(0, 200));
+
+        JLabel tituloAlertas = new JLabel("⚠️ ALERTAS DE STOCK CRÍTICO (REABASTECIMIENTO)");
+        tituloAlertas.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        tituloAlertas.setForeground(new Color(255, 100, 100));
+        panel.add(tituloAlertas, BorderLayout.NORTH);
+
+        String[] columnasAlertas = { "Producto", "Marca", "Stock Actual", "Stock Mínimo", "Status" };
+        modeloAlertas = new DefaultTableModel(columnasAlertas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        tablaAlertas = new JTable(modeloAlertas);
+        tablaAlertas.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        tablaAlertas.setRowHeight(35);
+        tablaAlertas.setBackground(new Color(60, 40, 40));
+        tablaAlertas.setForeground(Color.WHITE);
+        tablaAlertas.getTableHeader().setBackground(new Color(80, 20, 20));
+        tablaAlertas.getTableHeader().setForeground(Color.WHITE);
+
+        JScrollPane scrollAlertas = new JScrollPane(tablaAlertas);
+        scrollAlertas.setBorder(BorderFactory.createLineBorder(new Color(100, 50, 50)));
+        scrollAlertas.getViewport().setBackground(new Color(60, 40, 40));
+        panel.add(scrollAlertas, BorderLayout.CENTER);
+
+        return panel;
     }
 
     private void editarProductoSeleccionado() {
@@ -270,10 +320,28 @@ public class VistaInventario extends JPanel {
                 };
                 modeloProductos.addRow(fila);
             }
+
+            actualizarAlertas(productos);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,
                     "Error al cargar productos: " + e.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void actualizarAlertas(java.util.List<Producto> productos) {
+        modeloAlertas.setRowCount(0);
+        for (Producto p : productos) {
+            if (p.necesitaReposicion()) {
+                Object[] fila = {
+                        p.getNombre(),
+                        p.getMarca(),
+                        p.getStockActual(),
+                        p.getStockMinimo(),
+                        "🚨 URGENTE"
+                };
+                modeloAlertas.addRow(fila);
+            }
         }
     }
 
