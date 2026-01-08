@@ -1,5 +1,7 @@
 package com.tienda.controller;
 
+import com.tienda.model.Abarrotes;
+import com.tienda.model.Frescos;
 import com.tienda.model.PedidoProveedor;
 import com.tienda.model.Producto;
 import java.time.LocalDate;
@@ -10,6 +12,10 @@ import java.util.List;
  * CONTROLADOR: PedidoProveedorController (Unidad V - MVC)
  * Actúa como el puente entre la Vista (VistaPedidos) y los Modelos.
  * Aquí se concentra la 'Lógica de Negocio' para el resurtido de stock.
+ * 
+ * // Aquí el administrador ya puede planear cuándo llega la mercancía y cómo lo
+ * va a pagar,
+ * // para que no lo agarren desprevenido
  */
 public class PedidoProveedorController {
     // Almacenamos los datos en listas (Persistencia volátil por ahora)
@@ -104,13 +110,27 @@ public class PedidoProveedorController {
                     Producto productoInventario = productoController.buscarProducto(
                             productoPedido.getCodigoBarras());
 
+                    int incrementoStock = 1;
+                    if (productoPedido instanceof Abarrotes) {
+                        // --- ABSTRACCIÓN DE COMPRA (Pieza vs Paquete) ---
+                        // // Aquí calculo cuántas piezas entran al estante cuando el proveedor me trae
+                        // un paquete,
+                        // para que el stock siempre sea por pieza individual
+                        incrementoStock = ((Abarrotes) productoPedido).getUnidadesPorPaquete();
+                        if (incrementoStock <= 0)
+                            incrementoStock = 1; // Fallback por si no se configuró
+                    } else if (productoPedido instanceof Frescos && ((Frescos) productoPedido).isSeVendePorGramos()) {
+                        // REQUERIMIENTO: Si es por peso, sumamos los gramos de la pieza
+                        incrementoStock = (int) ((Frescos) productoPedido).getPesoPorPiezaGramos();
+                    }
+
                     if (productoInventario != null) {
-                        // Sumar 1 al stock actual por cada ocurrencia en la lista del pedido
+                        // Sumar el incremento al stock actual
                         productoInventario.setStockActual(
-                                productoInventario.getStockActual() + 1);
+                                productoInventario.getStockActual() + incrementoStock);
                     } else {
-                        // Si el producto no existe en el catálogo, lo agregamos con stock inicial 1
-                        productoPedido.setStockActual(1);
+                        // Si el producto no existe en el catálogo, lo agregamos con el stock inicial
+                        productoPedido.setStockActual(incrementoStock);
                         productoController.agregarProducto(productoPedido);
                     }
                 }

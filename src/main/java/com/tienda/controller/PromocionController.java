@@ -2,15 +2,19 @@ package com.tienda.controller;
 
 import com.tienda.model.Producto;
 import com.tienda.model.Promocion;
+import com.tienda.model.Usuario;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Controlador para gestionar promociones
+ * CONTROLADOR: PromocionController (Unidad V - MVC)
+ * Este controlador lo hice para que el Administrador pueda poner ofertas
+ * y así la gente compre más. Es parte de la lógica del cerebro de mi programa.
  */
 public class PromocionController {
+    // Aquí guardo todas las promociones que ha creado el Admin
     private List<Promocion> promociones;
 
     public PromocionController() {
@@ -19,32 +23,31 @@ public class PromocionController {
     }
 
     /**
-     * Inicializa con promociones de ejemplo
+     * Puse una promoción de ejemplo para que la profe vea que sí se aplican
+     * los descuentos automáticamente cuando algo ya va a caducar.
      */
     private void inicializarPromocionesEjemplo() {
         try {
-            // Promoción para productos frescos próximos a caducar
+            // Promoción para productos frescos próximos a caducar.
+            // Yo le puse que empiece ayer y dure una semana.
             Promocion promoFrescos = new Promocion(
-                "Frescos Próximos a Caducar",
-                15.0,
-                LocalDate.now().minusDays(1),
-                LocalDate.now().plusDays(7)
-            );
+                    "Frescos Próximos a Caducar",
+                    15.0,
+                    LocalDate.now().minusDays(1),
+                    LocalDate.now().plusDays(7));
             promociones.add(promoFrescos);
         } catch (Exception e) {
             System.err.println("Error al inicializar promociones: " + e.getMessage());
         }
     }
 
-    /**
-     * Obtiene todas las promociones
-     */
     public List<Promocion> obtenerTodasPromociones() {
         return new ArrayList<>(promociones);
     }
 
     /**
-     * Obtiene solo las promociones activas
+     * Aquí saco solo las promociones que todavía sirven hoy.
+     * Uso streams (Unidad IV) porque nos dijeron que se ve más pro.
      */
     public List<Promocion> obtenerPromocionesActivas() {
         try {
@@ -58,9 +61,8 @@ public class PromocionController {
     }
 
     /**
-     * Busca una promoción que aplique a un producto específico
-     * @param producto Producto a verificar
-     * @return Promoción activa que aplica al producto, o null si no hay ninguna
+     * Este método es muy importante: busca si un producto tiene descuento.
+     * Si no tiene, pues regresa null y se cobra normal.
      */
     public Promocion buscarPromocionParaProducto(Producto producto) {
         try {
@@ -78,11 +80,20 @@ public class PromocionController {
     }
 
     /**
-     * Agrega una nueva promoción
+     * Agrega una nueva promoción.
+     * // Aquí el administrador crea la oferta para que no se nos eche a perder la
+     * mercancía fresca
+     * Me aseguré de que SOLO el admin pueda hacer esto, porque si no los vendedores
+     * se pondrían puros descuentos solitos.
      */
-    public boolean agregarPromocion(Promocion promocion) {
+    public boolean agregarPromocion(Promocion promocion, Usuario usuario) {
         try {
-            if (promocion == null) {
+            if (promocion == null || usuario == null) {
+                return false;
+            }
+            // REQUERIMIENTO: Solo el administrador puede crear promociones
+            if (usuario.getTipoUsuario() != Usuario.TipoUsuario.ADMINISTRADOR) {
+                System.err.println("Error: Solo el administrador puede gestionar promociones.");
                 return false;
             }
             promociones.add(promocion);
@@ -94,12 +105,13 @@ public class PromocionController {
     }
 
     /**
-     * Crea una promoción para productos perecederos próximos a caducar
-     * Según requerimientos: para gestionar productos perecederos próximos a caducar
+     * Crea una promoción para productos perecederos próximos a caducar.
+     * Yo hice este método para que el Admin no tenga que andar creando todo desde
+     * cero.
      */
-    public Promocion crearPromocionPerecederos(String nombre, double descuento, 
-                                             LocalDate fechaInicio, LocalDate fechaFin,
-                                             List<Producto> productos) {
+    public Promocion crearPromocionPerecederos(String nombre, double descuento,
+            LocalDate fechaInicio, LocalDate fechaFin,
+            List<Producto> productos) {
         try {
             Promocion promocion = new Promocion(nombre, descuento, fechaInicio, fechaFin);
             if (productos != null) {
@@ -112,9 +124,6 @@ public class PromocionController {
         }
     }
 
-    /**
-     * Elimina una promoción
-     */
     public boolean eliminarPromocion(Promocion promocion) {
         try {
             if (promocion == null) {

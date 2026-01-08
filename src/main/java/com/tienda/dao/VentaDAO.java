@@ -5,42 +5,35 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Interfaz DAO para persistencia de Ventas
- * Unidad V: Mapeo Objeto-Relacional básico
+ * INTERFAZ DAO: VentaDAO (Unidad V - Persistencia)
+ * Aquí es donde defino qué debe poder hacer mi sistema con las ventas
+ * que guardamos. Es como un contrato que dice: "si quieres guardar ventas,
+ * tienes que poder hacer todo esto". Aplicación de Abstracción pura.
  */
 public interface VentaDAO {
     /**
-     * Guarda una venta en la base de datos
-     * @param venta Venta a guardar
-     * @return true si se guardó correctamente
+     * Guarda una venta para que no se nos olvide cuánto dinero entró.
      */
     boolean guardar(Venta venta);
 
     /**
-     * Busca una venta por fecha
-     * @param fecha Fecha de la venta
-     * @return Lista de ventas de esa fecha
+     * Busca qué vendimos en un día específico.
      */
     List<Venta> buscarPorFecha(LocalDate fecha);
 
     /**
-     * Obtiene todas las ventas
-     * @return Lista de todas las ventas
+     * Trae todas las ventas que se han hecho en la historia de la tienda.
      */
     List<Venta> obtenerTodas();
 
     /**
-     * Obtiene ventas por rango de fechas
-     * @param fechaInicio Fecha de inicio
-     * @param fechaFin Fecha de fin
-     * @return Lista de ventas en el rango
+     * Saca las ventas de un periodo de tiempo (por ejemplo, de lunes a viernes).
      */
     List<Venta> obtenerPorRangoFechas(LocalDate fechaInicio, LocalDate fechaFin);
 
     /**
-     * Obtiene el total de ventas por forma de pago
-     * @param formaPago Forma de pago (Efectivo, Tarjeta, etc.)
-     * @return Total de ventas con esa forma de pago
+     * Calcula cuánto dinero entró por Efectivo o por Tarjeta.
+     * Muy útil para el corte de caja.
      */
     double obtenerTotalPorFormaPago(String formaPago);
 }

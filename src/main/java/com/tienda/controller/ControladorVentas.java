@@ -67,9 +67,12 @@ public class ControladorVentas {
             }
 
             // Aplicamos polimorfismo para ver si hay promos para este producto
+            // // Aquí el Administrador toma el control para incentivar la venta de lo que
+            // él decida,
+            // no solo lo que el sistema diga
             if (promocionController != null) {
                 Promocion promocion = promocionController.buscarPromocionParaProducto(producto);
-                if (promocion != null && promocion.isVigente()) {
+                if (promocion != null && promocion.estaActiva()) {
                     ventaActual.aplicarPromocion(promocion);
                 }
             }

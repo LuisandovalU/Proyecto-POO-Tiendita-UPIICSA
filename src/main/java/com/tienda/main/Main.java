@@ -4,8 +4,10 @@ import com.tienda.view.MainWindow;
 import javax.swing.SwingUtilities;
 
 /**
- * Clase principal para ejecutar la aplicación
- * Inicia directamente con perfil de Vendedor
+ * CLASE PRINCIPAL: Main (Donde empieza todo)
+ * Este es el punto de arranque de mi programa. Yo lo configuré para que
+ * abra la MainWindow y de ahí ya el usuario pueda navegar por toda la tienda.
+ * Inicia directamente como Vendedor por si no queremos pasar por el login.
  */
 public class Main {
     public static void main(String[] args) {
@@ -19,8 +21,8 @@ public class Main {
                     System.err.println("Error al iniciar la aplicación: " + e.getMessage());
                     e.printStackTrace();
                     javax.swing.JOptionPane.showMessageDialog(null,
-                        "Error al iniciar la aplicación: " + e.getMessage(),
-                        "Error Fatal", javax.swing.JOptionPane.ERROR_MESSAGE);
+                            "Error al iniciar la aplicación: " + e.getMessage(),
+                            "Error Fatal", javax.swing.JOptionPane.ERROR_MESSAGE);
                 }
             });
         } catch (Exception e) {

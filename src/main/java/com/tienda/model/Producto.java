@@ -6,13 +6,14 @@ import java.util.Objects;
  * CLASE ABSTRACTA: Producto (Unidad III - Herencia y Polimorfismo)
  * Esta es la clase base de todo mi sistema. La puse abstracta porque no tiene
  * sentido crear un "Producto" a secas, siempre tiene que ser algo como leche o
- * frituras.
+ * frituras. La profe dijo que esto es lo mejor para no andar repitiendo código.
  */
 public abstract class Producto {
     // ENCAPSULAMIENTO (Unidad II):
     // Usé private aquí para que nadie de fuera pueda moverle a los datos sin
     // permiso,
-    // así protejo la integridad de la información de mi programa.
+    // así protejo la integridad de la información de mi programa. Mis compañeros
+    // luego quieren cambiar los precios directo y así no se puede.
     private String codigoBarras;
     private String nombre;
     private String marca;
@@ -27,6 +28,10 @@ public abstract class Producto {
 
     public Producto(String codigoBarras, String nombre, String marca, String tamanoGramaje,
             double precioCompra, double precioVenta, int stockActual, int stockMinimo) {
+        // Aquí permitimos variedad para que el precio cambie según la marca o el
+        // tamaño,
+        // como en una tienda real. Me aseguré de que todo se guarde bien desde el
+        // inicio.
         this.codigoBarras = codigoBarras;
         this.nombre = nombre;
         this.marca = marca;
@@ -40,20 +45,21 @@ public abstract class Producto {
     /**
      * UNIDAD III - MÉTODO ABSTRACTO:
      * Este método lo tienen que implementar a fuerzas todos los hijos para
-     * mostrar sus propios datos, aplicando el polimorfismo.
+     * mostrar sus propios datos, aplicando el polimorfismo. Es como una receta
+     * que cada quien sigue a su modo.
      */
     public abstract void mostrarDetalles();
 
     /**
      * UNIDAD III - MÉTODO ABSTRACTO:
-     * Cada tipo de producto debe devolver su información única y específica.
+     * Cada tipo de producto debe devolver su información única. Yo lo hice así
+     * para que si es un Refresco diga una cosa y si es Jamón diga otra.
      */
     public abstract String getDetallesEspecificos();
 
     /**
      * Aquí checo si todavía tengo mercancía en la tienda.
-     * 
-     * @return true si todavía hay, false si ya se acabó.
+     * Si regresa false, ya valió y hay que pedir más.
      */
     public boolean verificarStock() {
         try {
@@ -65,6 +71,7 @@ public abstract class Producto {
 
     /**
      * Este método me avisa si ya me queda poquito para ir a pedirle al proveedor.
+     * Es para que no nos quedemos sin nada que vender.
      */
     public boolean necesitaReposicion() {
         try {
@@ -75,8 +82,8 @@ public abstract class Producto {
     }
 
     /**
-     * Con esto calculo cuánto va a costar con el descuento que me diga la profe o
-     * el sistema.
+     * Con esto calculo cuánto va a costar con el descuento que me diga la profe
+     * o lo que el Administrador ponga en su panel.
      */
     public double calcularPrecioConDescuento(double descuento) {
         try {
@@ -90,6 +97,7 @@ public abstract class Producto {
     }
 
     // Getters y Setters para poder entrar a los datos privados (Encapsulamiento)
+    // Los hice todos para que la Unidad II quede completa.
     public String getCodigoBarras() {
         return codigoBarras;
     }

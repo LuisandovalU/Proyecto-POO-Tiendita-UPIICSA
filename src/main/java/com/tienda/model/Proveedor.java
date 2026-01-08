@@ -5,13 +5,18 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Clase que representa un proveedor
+ * CLASE: Proveedor (Unidad II - Clases y Objetos)
+ * Aquí guardo quién nos trae la mercancía. Yo le puse esta clase
+ * para tener a la mano el teléfono y el contacto por si algo falla.
  */
 public class Proveedor {
+    // Encapsulamiento (Unidad II): Todo privado para que no se nos pierda el
+    // contacto.
     private String nombreEmpresa;
     private String telefono;
     private String contacto;
     private List<Producto> productosSolicitados;
+    private boolean entregaEnTienda; // Aquí anoto si el proveedor viene o si yo tengo que ir por las cosas
 
     public Proveedor() {
         this.productosSolicitados = new ArrayList<>();
@@ -24,7 +29,7 @@ public class Proveedor {
         this.contacto = contacto;
     }
 
-    // Getters y Setters
+    // Getters y Setters (Para entrar a los datos privados como pide la Unidad II)
     public String getNombreEmpresa() {
         return nombreEmpresa;
     }
@@ -57,6 +62,14 @@ public class Proveedor {
         this.productosSolicitados = productosSolicitados;
     }
 
+    public boolean isEntregaEnTienda() {
+        return entregaEnTienda;
+    }
+
+    public void setEntregaEnTienda(boolean entregaEnTienda) {
+        this.entregaEnTienda = entregaEnTienda;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -74,6 +87,8 @@ public class Proveedor {
 
     @Override
     public String toString() {
-        return nombreEmpresa;
+        // Aquí le puse un extra para saber si nosotros tenemos que ir por la carga.
+        String logistica = entregaEnTienda ? "" : " (Recolección Propia)";
+        return nombreEmpresa + logistica;
     }
 }

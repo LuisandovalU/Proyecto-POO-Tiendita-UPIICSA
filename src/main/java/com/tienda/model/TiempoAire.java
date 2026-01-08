@@ -14,7 +14,7 @@ public class TiempoAire extends Producto {
     private String compania;
     private String numeroCelular;
 
-    // REGLAS DE NEGOCIO de mi sistema
+    // REGLAS DE NEGOCIO (Monto mínimo $10.00 según requerimiento)
     public static final List<Integer> MONTOS_PERMITIDOS = Arrays.asList(10, 20, 50, 100, 200, 500);
     public static final List<String> COMPANIAS_PERMITIDAS = Arrays.asList("Telcel", "Movistar", "AT&T", "Unefon");
 
@@ -34,7 +34,7 @@ public class TiempoAire extends Producto {
     public TiempoAire(String codigoBarras, String nombre, String marca, String tamanoGramaje,
             double precioCompra, double precioVenta, int stockActual, int stockMinimo,
             String compania, String numeroCelular) {
-        // Uso el constructor del papá
+        // Aquí le pasamos los datos al papá con el super().
         super(codigoBarras, nombre, marca, tamanoGramaje, precioCompra, precioVenta, stockActual, stockMinimo);
         this.compania = compania;
         this.numeroCelular = numeroCelular;
@@ -42,8 +42,8 @@ public class TiempoAire extends Producto {
 
     @Override
     public void mostrarDetalles() {
-        // Polimorfismo: muestro lo que es importante para la recarga
-        System.out.println("SERVICIO: " + getNombre());
+        // Polimorfismo: muestro de qué compañía es la recarga y el número.
+        System.out.println("RECARGA TELEFÓNICA: " + getNombre());
         System.out.println("Compañía: " + compania);
         System.out.println("Número: " + numeroCelular);
     }
@@ -53,7 +53,7 @@ public class TiempoAire extends Producto {
         return "Compañía: " + compania + ", Cel: " + numeroCelular;
     }
 
-    // Getters y Setters (Encapsulamiento)
+    // Getters y Setters (Para que el Encapsulamiento funcione bien)
     public String getCompania() {
         return compania;
     }
@@ -74,9 +74,8 @@ public class TiempoAire extends Producto {
      * Valida que el monto sea uno de los permitidos por la tienda.
      */
     public void validarMonto(double monto) throws IllegalArgumentException {
-        if (!MONTOS_PERMITIDOS.contains((int) monto)) {
-            throw new IllegalArgumentException("Monto no válido para Tiempo Aire: $" + monto +
-                    ". Montos permitidos: " + MONTOS_PERMITIDOS);
+        if (monto < 1.0) {
+            throw new IllegalArgumentException("El monto mínimo de recarga es $1.00");
         }
     }
 

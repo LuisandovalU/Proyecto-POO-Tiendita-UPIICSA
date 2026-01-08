@@ -2,12 +2,12 @@ package com.tienda.model;
 
 /**
  * CLASE HIJA: Limpieza (Unidad III - Herencia)
- * Esta clase es para los jabones, cloros y todo eso. Hereda de Producto
- * porque siguen siendo cosas que vendo en mi tiendita.
+ * Esta clase es para el cloro, jabón y esas cosas. Heredan de Producto
+ * para que no me canse escribiendo lo mismo 20 veces.
  */
 public class Limpieza extends Producto {
-    // Encapsulamiento: atributo privado
-    private String usoEspecifico;
+    // Encapsulamiento: atributo privado. No queremos que nadie lave mal los datos.
+    private String instruccionesUso;
 
     public Limpieza() {
         super();
@@ -15,30 +15,30 @@ public class Limpieza extends Producto {
 
     public Limpieza(String codigoBarras, String nombre, String marca, String tamanoGramaje,
             double precioCompra, double precioVenta, int stockActual, int stockMinimo,
-            String usoEspecifico) {
-        // Constructor del papá para ahorrar código
+            String instruccionesUso) {
+        // Usamos super() como nos enseñaron en clase para llamar al papá.
         super(codigoBarras, nombre, marca, tamanoGramaje, precioCompra, precioVenta, stockActual, stockMinimo);
-        this.usoEspecifico = usoEspecifico;
+        this.instruccionesUso = instruccionesUso;
     }
 
     @Override
     public void mostrarDetalles() {
-        // Polimorfismo en acción
+        // Polimorfismo: muestro lo que es especial de limpieza.
         System.out.println("PRODUCTO DE LIMPIEZA: " + getNombre());
-        System.out.println("Uso: " + usoEspecifico);
+        System.out.println("Instrucciones: " + instruccionesUso);
     }
 
     @Override
     public String getDetallesEspecificos() {
-        return "Uso: " + usoEspecifico;
+        return "Instrucciones: " + instruccionesUso;
     }
 
-    // Getters y Setters
-    public String getUsoEspecifico() {
-        return usoEspecifico;
+    // Getters y Setters (Unidad II - Encapsulamiento)
+    public String getInstruccionesUso() {
+        return instruccionesUso;
     }
 
-    public void setUsoEspecifico(String usoEspecifico) {
-        this.usoEspecifico = usoEspecifico;
+    public void setInstruccionesUso(String instruccionesUso) {
+        this.instruccionesUso = instruccionesUso;
     }
 }

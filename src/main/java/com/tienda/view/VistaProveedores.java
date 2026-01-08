@@ -8,8 +8,10 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 /**
- * Vista del módulo de Proveedores
- * Permite gestionar la lista de Proveedores (nombreEmpresa, telefono, contacto)
+ * VISTA: VistaProveedores (Unidad V - Interfaz Gráfica)
+ * Aquí es donde anotamos quién nos surte las cosas. Usé una tabla para
+ * que se vea todo bien alineado y puse un botón de eliminar porque
+ * a veces dejamos de trabajar con algunos proveedores.
  */
 public class VistaProveedores extends JPanel {
     private ProveedorController proveedorController;
@@ -18,16 +20,16 @@ public class VistaProveedores extends JPanel {
 
     public VistaProveedores(ProveedorController proveedorController) {
         this.proveedorController = proveedorController;
-        
+
         setLayout(new BorderLayout(10, 10));
         setBackground(new Color(45, 45, 45));
-        
+
         inicializarComponentes();
         actualizarTabla();
     }
 
     private void inicializarComponentes() {
-        // Panel superior con título y botones
+        // Panel superior con el título y los botones de acción para la vista.
         JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelSuperior.setBackground(new Color(35, 35, 35));
         panelSuperior.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
@@ -36,9 +38,10 @@ public class VistaProveedores extends JPanel {
         titulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
         titulo.setForeground(Color.WHITE);
         panelSuperior.add(titulo);
-        
+
         panelSuperior.add(Box.createHorizontalStrut(20));
-        
+
+        // Botón para dar de alta un proveedor nuevo.
         JButton btnAgregar = new JButton("Agregar Proveedor");
         btnAgregar.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         btnAgregar.setBackground(new Color(0, 150, 0));
@@ -48,7 +51,8 @@ public class VistaProveedores extends JPanel {
         btnAgregar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnAgregar.addActionListener(e -> agregarProveedor());
         panelSuperior.add(btnAgregar);
-        
+
+        // Botón para refrescar la lista por si hubo cambios en los datos.
         JButton btnActualizar = new JButton("Actualizar");
         btnActualizar.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         btnActualizar.setBackground(new Color(0, 120, 215));
@@ -61,12 +65,13 @@ public class VistaProveedores extends JPanel {
 
         add(panelSuperior, BorderLayout.NORTH);
 
-        // Tabla de proveedores
-        String[] columnas = {"Nombre Empresa", "Teléfono", "Contacto", "Eliminar"};
+        // La tabla donde mostramos a los proveedores (Clases y Objetos de la Unidad
+        // II).
+        String[] columnas = { "Nombre Empresa", "Teléfono", "Contacto", "Eliminar" };
         modeloProveedores = new DefaultTableModel(columnas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 3;
+                return column == 3; // Solo dejo editar la columna de eliminar para que el botón sirva.
             }
         };
 
@@ -80,6 +85,8 @@ public class VistaProveedores extends JPanel {
         tablaProveedores.getTableHeader().setForeground(Color.WHITE);
         tablaProveedores.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
 
+        // Puse un renderizador de botones para que el botón de "Eliminar" sí se vea
+        // como botón.
         tablaProveedores.getColumn("Eliminar").setCellRenderer(new ButtonRenderer());
         tablaProveedores.getColumn("Eliminar").setCellEditor(new ButtonEditorEliminar(new JCheckBox()));
 
@@ -96,17 +103,17 @@ public class VistaProveedores extends JPanel {
 
             for (Proveedor proveedor : proveedores) {
                 Object[] fila = {
-                    proveedor.getNombreEmpresa(),
-                    proveedor.getTelefono(),
-                    proveedor.getContacto(),
-                    "Eliminar"
+                        proveedor.getNombreEmpresa(),
+                        proveedor.getTelefono(),
+                        proveedor.getContacto(),
+                        "Eliminar"
                 };
                 modeloProveedores.addRow(fila);
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,
-                "Error al cargar proveedores: " + e.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
+                    "Error al cargar proveedores: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -125,8 +132,8 @@ public class VistaProveedores extends JPanel {
             panel.add(txtContacto);
 
             int resultado = JOptionPane.showConfirmDialog(this, panel,
-                "Agregar Proveedor", JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.PLAIN_MESSAGE);
+                    "Agregar Proveedor", JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE);
 
             if (resultado == JOptionPane.OK_OPTION) {
                 String nombre = txtNombre.getText().trim();
@@ -135,27 +142,27 @@ public class VistaProveedores extends JPanel {
 
                 if (nombre.isEmpty() || telefono.isEmpty() || contacto.isEmpty()) {
                     JOptionPane.showMessageDialog(this,
-                        "Todos los campos son obligatorios",
-                        "Error", JOptionPane.ERROR_MESSAGE);
+                            "Todos los campos son obligatorios",
+                            "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
                 Proveedor proveedor = new Proveedor(nombre, telefono, contacto);
                 if (proveedorController.agregarProveedor(proveedor)) {
                     JOptionPane.showMessageDialog(this,
-                        "Proveedor agregado exitosamente",
-                        "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                            "Proveedor agregado exitosamente",
+                            "Éxito", JOptionPane.INFORMATION_MESSAGE);
                     actualizarTabla();
                 } else {
                     JOptionPane.showMessageDialog(this,
-                        "Ya existe un proveedor con ese nombre",
-                        "Error", JOptionPane.ERROR_MESSAGE);
+                            "Ya existe un proveedor con ese nombre",
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,
-                "Error al agregar proveedor: " + e.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
+                    "Error al agregar proveedor: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -163,27 +170,27 @@ public class VistaProveedores extends JPanel {
         try {
             String nombreEmpresa = (String) modeloProveedores.getValueAt(fila, 0);
             int confirmacion = JOptionPane.showConfirmDialog(this,
-                "¿Está seguro de eliminar el proveedor: " + nombreEmpresa + "?",
-                "Confirmar Eliminación",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE);
+                    "¿Está seguro de eliminar el proveedor: " + nombreEmpresa + "?",
+                    "Confirmar Eliminación",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
 
             if (confirmacion == JOptionPane.YES_OPTION) {
                 if (proveedorController.eliminarProveedor(nombreEmpresa)) {
                     JOptionPane.showMessageDialog(this,
-                        "Proveedor eliminado exitosamente",
-                        "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                            "Proveedor eliminado exitosamente",
+                            "Éxito", JOptionPane.INFORMATION_MESSAGE);
                     actualizarTabla();
                 } else {
                     JOptionPane.showMessageDialog(this,
-                        "Error al eliminar el proveedor",
-                        "Error", JOptionPane.ERROR_MESSAGE);
+                            "Error al eliminar el proveedor",
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,
-                "Error al eliminar proveedor: " + e.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
+                    "Error al eliminar proveedor: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

@@ -3,10 +3,13 @@ package com.tienda.model;
 import java.util.Objects;
 
 /**
- * Clase base para usuarios del sistema
- * Implementa polimorfismo para diferentes tipos de usuarios
+ * Clase base para usuarios del sistema. Yo la hice para que no tengamos
+ * que repetir el nombre y la contraseña en cada tipo de usuario.
+ * Implementa polimorfismo (Unidad III) para que cada quien tenga sus permisos.
  */
 public abstract class Usuario {
+    // Usamos protected para que mis clases hijas (Admin, Vendedor) puedan
+    // usar las variables sin problemas, pero que los de fuera no las vean.
     protected String nombreUsuario;
     protected String contrasena;
     protected String nombreCompleto;
@@ -29,24 +32,26 @@ public abstract class Usuario {
     }
 
     /**
-     * Método abstracto para verificar permisos específicos de cada tipo de usuario
-     * Aplicación de polimorfismo
+     * MÉTODO ABSTRACTO (Unidad III):
+     * Este lo hice para ver si el usuario puede o no hacer algo.
+     * Es puro polimorfismo porque un Admin puede todo y un Vendedor no.
      */
     public abstract boolean tienePermiso(String accion);
 
     /**
-     * Verifica las credenciales del usuario
+     * Verifica que la contraseña sea la correcta.
+     * Yo le puse un try-catch por si se me pasaba algún nulo.
      */
     public boolean verificarCredenciales(String nombreUsuario, String contrasena) {
         try {
-            return this.nombreUsuario.equals(nombreUsuario) && 
-                   this.contrasena.equals(contrasena);
+            return this.nombreUsuario.equals(nombreUsuario) &&
+                    this.contrasena.equals(contrasena);
         } catch (Exception e) {
             return false;
         }
     }
 
-    // Getters y Setters
+    // Getters y Setters (Encapsulamiento de la Unidad II)
     public String getNombreUsuario() {
         return nombreUsuario;
     }
@@ -81,8 +86,10 @@ public abstract class Usuario {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Usuario usuario = (Usuario) o;
         return Objects.equals(nombreUsuario, usuario.nombreUsuario);
     }

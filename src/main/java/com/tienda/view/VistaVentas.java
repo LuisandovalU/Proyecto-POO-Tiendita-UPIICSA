@@ -14,8 +14,10 @@ import java.time.LocalDate;
 import java.text.DecimalFormat;
 
 /**
- * Vista del módulo de Ventas
- * Permite agregar productos a listaProductos, calcular total y finalizarVenta()
+ * VISTA: VistaVentas (Unidad V - Interfaz Gráfica)
+ * Esta es la parte que el usuario ve para cobrar. Aquí conecto todo lo que
+ * el cajero hace con la lógica de mi "Venta Controller". Me aseguré de que
+ * se vea bonito porque si no la profe nos baja puntos.
  */
 public class VistaVentas extends JPanel {
     private ProductoController productoController;
@@ -316,6 +318,34 @@ public class VistaVentas extends JPanel {
             Producto productoAAgregar = producto;
 
             if (producto instanceof Frescos) {
+                Frescos frescos = (Frescos) producto;
+
+                // --- POLIMORFISMO Y ABSTRACCIÓN (Unidad III) ---
+                // Si el producto es por gramos, preguntamos el peso.
+                if (frescos.isSeVendePorGramos()) {
+                    String gramosStr = JOptionPane.showInputDialog(this,
+                            "¿Cuántos gramos desea vender?",
+                            "Venta por Peso",
+                            JOptionPane.QUESTION_MESSAGE);
+
+                    if (gramosStr != null && !gramosStr.trim().isEmpty()) {
+                        try {
+                            double gramos = Double.parseDouble(gramosStr);
+                            // Aquí usamos polimorfismo para que si el producto es por gramos,
+                            // el precio se calcule solito dividiendo el precio por kilo entre 1000
+                            // y multiplicando por lo que pesa.
+                            frescos.setCantidadGramos(gramos);
+                            productoAAgregar = frescos;
+                        } catch (Exception e) {
+                            JOptionPane.showMessageDialog(this, "Cantidad inválida.", "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                    } else {
+                        return; // Cancelar si no ingresa gramos
+                    }
+                }
+
                 // Pedir fecha de caducidad si es Frescos
                 String fechaStr = JOptionPane.showInputDialog(this,
                         "Ingrese la fecha de caducidad (YYYY-MM-DD):",
@@ -325,7 +355,6 @@ public class VistaVentas extends JPanel {
                 if (fechaStr != null && !fechaStr.trim().isEmpty()) {
                     try {
                         LocalDate fechaCaducidad = LocalDate.parse(fechaStr);
-                        Frescos frescos = (Frescos) producto;
                         frescos.setFechaCaducidad(fechaCaducidad);
                         productoAAgregar = frescos;
                     } catch (Exception e) {
@@ -619,6 +648,21 @@ public class VistaVentas extends JPanel {
         txtNumero.setFont(new Font("Segoe UI", Font.BOLD, 18));
         txtNumero.setHorizontalAlignment(JTextField.CENTER);
 
+        JTextField txtMontoPersonalizado = new JTextField(5);
+        txtMontoPersonalizado.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        txtMontoPersonalizado.setHorizontalAlignment(JTextField.CENTER);
+
+        // KeyListener para monto (solo números y decimales)
+        txtMontoPersonalizado.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyTyped(java.awt.event.KeyEvent e) {
+                char c = e.getKeyChar();
+                if (!Character.isDigit(c) && c != '.') {
+                    e.consume();
+                }
+            }
+        });
+
         // KeyListener (Unidad IV)
         txtNumero.addKeyListener(new java.awt.event.KeyAdapter() {
             @Override
@@ -634,6 +678,8 @@ public class VistaVentas extends JPanel {
         panelForm.add(comboCompanias);
         panelForm.add(new JLabel("Número Celular (10 dígitos):"));
         panelForm.add(txtNumero);
+        panelForm.add(new JLabel("Monto Personalizado (Opcional):"));
+        panelForm.add(txtMontoPersonalizado);
 
         // Botones de Monto
         JPanel panelMontos = new JPanel(new GridLayout(2, 3, 10, 10));
@@ -667,15 +713,28 @@ public class VistaVentas extends JPanel {
             try {
                 if (txtNumero.getText().length() != 10)
                     throw new IllegalArgumentException("El número debe tener 10 dígitos.");
-                if (montoSelected[0] == 0)
-                    throw new IllegalArgumentException("Seleccione un monto.");
+
+                double montoFinal = 0;
+                if (!txtMontoPersonalizado.getText().trim().isEmpty()) {
+                    montoFinal = Double.parseDouble(txtMontoPersonalizado.getText().trim());
+                } else if (montoSelected[0] > 0) {
+                    montoFinal = montoSelected[0];
+                }
+
+                if (montoFinal <= 0)
+                    throw new IllegalArgumentException("Seleccione un monto o ingrese uno personalizado.");
 
                 TiempoAire ta = new TiempoAire();
+                ta.validarMonto(montoFinal); // Validación del modelo
+
                 ta.setCodigoBarras("REC-TA");
                 ta.setPrecioCompra(0);
                 ta.setCompania((String) comboCompanias.getSelectedItem());
                 ta.setNumeroCelular(txtNumero.getText());
-                ta.setPrecioVenta(montoSelected[0]);
+
+                // Aquí le sumamos el peso de comisión que es la ganancia neta de la tienda por
+                // el servicio
+                ta.setPrecioVenta(montoFinal + 1.0);
 
                 // COMENTARIO (Unidad I): El objeto se inserta directamente en el modelo
                 // de la tabla para agilizar la venta, independizándolo del inventario físico.

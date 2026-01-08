@@ -16,8 +16,10 @@ import java.time.LocalDate;
 import java.text.DecimalFormat;
 
 /**
- * Vista del módulo de Pedidos Proveedor
- * Permite seleccionar proveedor, agregar productos y marcar como entregado
+ * VISTA: VistaPedidos (Unidad V - Interfaz Gráfica)
+ * Aquí es donde le pedimos más mercancía a los proveedores. Yo hice
+ * esta parte para que el Admin pueda elegir qué falta y mandarlo pedir.
+ * Se conecta con el PedidoController para que todo quede bien guardado.
  */
 public class VistaPedidos extends JPanel {
     private PedidoProveedorController pedidoController;
@@ -53,11 +55,11 @@ public class VistaPedidos extends JPanel {
     }
 
     private void inicializarComponentes() {
-        // Panel superior
+        // Panel de arriba con los botones y el combo de proveedores.
         JPanel panelSuperior = crearPanelSuperior();
         add(panelSuperior, BorderLayout.NORTH);
 
-        // Panel central dividido
+        // Panel del medio que dividí en dos: productos disponibles y el pedido actual.
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerLocation(500);
         splitPane.setLeftComponent(crearPanelProductos());
@@ -220,9 +222,9 @@ public class VistaPedidos extends JPanel {
             java.util.List<Producto> productos = productoController.obtenerTodosProductos();
 
             for (Producto producto : productos) {
-                // --- ABSTRACCIÓN DE COSTOS (Unidad I) ---
-                // Los servicios digitales de Tiempo Aire no se "resurten" físicamente
-                // a través de pedidos a proveedores tradicionales.
+                // ABSTRACCIÓN DE COSTOS (Unidad I):
+                // El Tiempo Aire no se "resurte" así con cajas, es digital, así que
+                // mejor ni lo pongo en la lista de pedidos físicos.
                 if (producto instanceof TiempoAire)
                     continue;
 
@@ -310,7 +312,8 @@ public class VistaPedidos extends JPanel {
                 return;
             }
 
-            // Lógica de herencia: reconocer tipo de producto
+            // POLIMORFISMO (Unidad III): Reconozco qué tipo de producto es para
+            // ver si necesito pedirle más datos (como la caducidad).
             Producto productoAAgregar = producto;
 
             if (producto instanceof Frescos) {

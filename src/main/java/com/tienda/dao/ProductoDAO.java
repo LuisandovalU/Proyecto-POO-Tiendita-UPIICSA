@@ -4,46 +4,35 @@ import com.tienda.model.Producto;
 import java.util.List;
 
 /**
- * Interfaz DAO para persistencia de Productos
- * Unidad V: Mapeo Objeto-Relacional básico
+ * INTERFAZ DAO: ProductoDAO (Unidad V - Persistencia)
+ * Esta es una interfaz para que sepamos qué métodos debe tener cualquier
+ * clase que quiera guardar productos, ya sea en una lista o en una base de
+ * datos.
+ * Como nos dijo la profe, esto es pura Abstracción.
  */
 public interface ProductoDAO {
     /**
-     * Guarda un producto en la base de datos
-     * 
-     * @param producto Producto a guardar
-     * @return true si se guardó correctamente
+     * Guarda un producto para que no se pierda.
      */
     boolean guardar(Producto producto);
 
     /**
-     * Busca un producto por código de barras
-     * 
-     * @param codigoBarras Código de barras del producto
-     * @return Producto encontrado o null
+     * Busca un producto por su código de barras.
      */
     Producto buscarProducto(String codigoBarras);
 
     /**
-     * Obtiene todos los productos
-     * 
-     * @return Lista de todos los productos
+     * Saca la lista de todos los productos que tenemos guardados.
      */
     List<Producto> obtenerTodos();
 
     /**
-     * Actualiza un producto existente
-     * 
-     * @param producto Producto a actualizar
-     * @return true si se actualizó correctamente
+     * Actualiza los datos de un producto que ya existía.
      */
     boolean actualizar(Producto producto);
 
     /**
-     * Elimina un producto
-     * 
-     * @param codigoBarras Código de barras del producto a eliminar
-     * @return true si se eliminó correctamente
+     * Borra el producto del sistema.
      */
     boolean eliminar(String codigoBarras);
 }

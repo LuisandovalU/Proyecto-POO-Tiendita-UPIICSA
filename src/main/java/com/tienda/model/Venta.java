@@ -7,7 +7,8 @@ import java.util.List;
 /**
  * CLASE: Venta (Unidad II - Clases y Objetos)
  * Esta es la clase más importante porque es el ticket de la venta.
- * Aquí guardo todo lo que el cliente se va a llevar.
+ * Aquí guardo todo lo que el cliente se va a llevar. Yo la hice pensando
+ * en que sea como un carrito de súper pero en código.
  */
 public class Venta implements Cloneable {
     // Estas son mis variables compartidas por toda la clase
@@ -15,7 +16,8 @@ public class Venta implements Cloneable {
 
     // ENCAPSULAMIENTO (Unidad II):
     // Todos mis atributos son private para que nadie les mueva nada
-    // por fuera del sistema (protección de datos).
+    // por fuera del sistema (protección de datos). Si alguien quiere
+    // cambiar el total, tiene que pasar por mis métodos.
     private int folio;
     private LocalDateTime fecha; // Registra la hora exacta (Unidad III)
     private String formaPago; // Si pagó con lana o tarjeta
@@ -27,7 +29,7 @@ public class Venta implements Cloneable {
     /**
      * SOBRECARGA DE CONSTRUCTORES (Unidad II):
      * Aquí hice el constructor vacío por si ocupo crear la venta antes
-     * de saber cómo va a pagar el cliente.
+     * de saber cómo va a pagar el cliente. Me sirve mucho para no trabarme.
      */
     public Venta() {
         this.folio = contadorFolios++;
@@ -41,6 +43,7 @@ public class Venta implements Cloneable {
     /**
      * SOBRECARGA DE CONSTRUCTORES (Unidad II):
      * Este otro constructor me sirve si ya desde el inicio sé cómo van a pagar.
+     * Es herencia de los conceptos que vimos en la primer semana.
      */
     public Venta(String formaPago) {
         this();
@@ -49,13 +52,14 @@ public class Venta implements Cloneable {
 
     /**
      * Este método lo hice para ir metiendo los productos al carrito.
-     * Uso polimorfismo porque puedo meter CUALQUIER producto al mismo tiempo.
+     * Uso polimorfismo porque puedo meter CUALQUIER producto al mismo tiempo:
+     * ya sea un refresco o un kilo de jamón.
      */
     public void agregarProducto(Producto producto) {
         try {
             if (producto != null && producto.verificarStock()) {
-                // Aquí checo si es un producto fresco para ver si le bajo el precio
-                // Este es un ejemplo de cómo uso el polimorfismo (instanceof)
+                // Aquí checo si es un producto fresco para ver si le bajo el precio.
+                // Este es un ejemplo de cómo uso el polimorfismo (instanceof).
                 if (producto instanceof Frescos) {
                     Frescos f = (Frescos) producto;
                     if (f.verificarCaducidad() && promocionAplicada == null) {
@@ -76,6 +80,7 @@ public class Venta implements Cloneable {
 
     /**
      * Con este método saco la cuenta de cuánto va a ser el total.
+     * Batallé un poco con los descuentos, pero ya quedó.
      */
     private void calcularTotal() {
         try {
@@ -125,7 +130,13 @@ public class Venta implements Cloneable {
             for (Producto producto : listaProductos) {
                 // Bajo el stock de mi inventario físico
                 if (producto.getStockActual() > 0) {
-                    producto.setStockActual(producto.getStockActual() - 1);
+                    if (producto instanceof Frescos && ((Frescos) producto).isSeVendePorGramos()) {
+                        Frescos f = (Frescos) producto;
+                        // Aquí va lo de los gramos porque los jamones son un relajo para el inventario.
+                        producto.setStockActual((int) (producto.getStockActual() - f.getCantidadGramos()));
+                    } else {
+                        producto.setStockActual(producto.getStockActual() - 1);
+                    }
                 }
 
                 // Aquí aplico la Unidad III (Polimorfismo) para ver tipos de productos
@@ -155,7 +166,8 @@ public class Venta implements Cloneable {
         }
     }
 
-    // Mis Getters y Setters para entrar a los datos privados
+    // Mis Getters y Setters para entrar a los datos privados (Encapsulamiento de la
+    // Unidad II)
     public int getFolio() {
         return folio;
     }
@@ -173,6 +185,9 @@ public class Venta implements Cloneable {
     }
 
     public void setFormaPago(String formaPago) {
+        if (formaPago == null || formaPago.trim().isEmpty()) {
+            throw new IllegalArgumentException("La forma de pago es obligatoria.");
+        }
         this.formaPago = formaPago;
     }
 

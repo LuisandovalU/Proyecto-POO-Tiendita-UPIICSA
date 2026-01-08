@@ -17,6 +17,8 @@ public class PedidoProveedor {
     private String estatus; // Pendiente, Generado, Entregado
     private List<Producto> listaProductos; // Los productos que esperamos recibir
     private Proveedor proveedor; // El Proveedor al que se le realiza el pedido
+    private String formaPago; // Efectivo, Crédito
+    private LocalDate fechaProbableEntrega;
 
     public PedidoProveedor() {
         this.fechaSolicitud = LocalDate.now();
@@ -77,5 +79,21 @@ public class PedidoProveedor {
 
     public void setProveedor(Proveedor proveedor) {
         this.proveedor = proveedor;
+    }
+
+    public String getFormaPago() {
+        return formaPago;
+    }
+
+    public void setFormaPago(String formaPago) {
+        this.formaPago = formaPago;
+    }
+
+    public LocalDate getFechaProbableEntrega() {
+        return fechaProbableEntrega;
+    }
+
+    public void setFechaProbableEntrega(LocalDate fechaProbableEntrega) {
+        this.fechaProbableEntrega = fechaProbableEntrega;
     }
 }
